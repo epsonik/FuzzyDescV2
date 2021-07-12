@@ -42,13 +42,12 @@ def from_pic(input_filename):
 
 
 # Prints in the console the variable as requested
-input_filename = "7775781830_e93c63f661_z.jpg"
+input_filename = "6813627120_a222bcba0d_z.jpg"
 
 gtruth = from_pic(input_filename)
 # gtruth = get_desk_pic()
 # gtruth = get_dog_pic()
-fuzzy = load_etykiety(
-)
+fuzzy = load_etykiety()
 fmpm_mat = fmpm(gtruth, fuzzy)
 
 pred = get_predicates(fmpm_mat, gtruth, fuzzy)
