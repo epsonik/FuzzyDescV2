@@ -92,18 +92,39 @@ def fam(fval1, fval2, fam_matrix):
     return outval
 
 
+# generuje listę pradykatów wraz z ich cechami
+# na podstawie niezerowych elementów FMPM
+# argumenty we:
+# fmpm_mat - macierz FMP
+# cene - dane sceny
+# fuzzy - paramtery rozmyte
+# wyjście - lista predykatów/macierz: wiersze - predykaty, kolumny:
+# 1 - obiekt
+# 2 - istotność obiektu
+# 3 - obiekt referencyjny
+# 4 - istotność obiektu referencyjnego
+# 5 - deskryptor 2D położenia/locus (numer)
+# 6 - istotność deskryptora położenia
+# 7 - deskryptor 2D orientacji/orientation (numer)
+# 8 - istotność deskryptora orientcji
+# 9 - wartość funkcji przynależności
+# nieposortowana lista predykatów
 def get_predicates(fmpm_mat, scene, fuzzy):
+    # liczba możliwych relacji
     ile_rel, _, ile_ob = fmpm_mat.shape
+    # wektor istotności obiektów (kryterium: wielkość):
     obj_sal = np.round(scene.obj[:, 4] * scene.obj[:, 5] / (scene.obj[0, 4] * scene.obj[0, 5]), 4)
+    # korekta istotności obrazu jako całości - ustawiamy ją sztucznie jako
+    # równą średniej istotności obiektu:
     obj_sal[0] = max(obj_sal[1:])
     plist = []
-    for i in range(ile_ob):
-        for j in range(ile_ob):
+    for i in range(ile_ob):  # iteracja po obiektach
+        for j in range(ile_ob):  # iteracja po obiektach referencyjnych
             if i != j:
                 for k in range(ile_rel):
-                    if fmpm_mat[k, j, i] > 0:
+                    if fmpm_mat[k, j, i] > 0:  # niezerowe deskryptory
                         ty = k % fuzzy.lev3.maxt
-                        r = int((k - ty) / fuzzy.lev3.maxt) - 1
+                        r = int((k - ty) / fuzzy.lev3.maxt) - 1  # orientacja
                         current = np.array(
                             [i, obj_sal[i], j, obj_sal[j], ty, fuzzy.lev3.tsal[ty], r, fuzzy.lev3.osal[r],
                              fmpm_mat[k, j, i]])
@@ -112,6 +133,7 @@ def get_predicates(fmpm_mat, scene, fuzzy):
 
 
 def sort_predicates(pred, scene, fuzzy, order):
+    # liczba obiektów na obrazie
     ile_ob = len(scene.obj)
     obj_anchors = np.zeros((ile_ob, 1))
     pred_out = []
