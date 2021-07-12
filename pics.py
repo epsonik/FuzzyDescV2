@@ -6,7 +6,7 @@ from PIL import Image
 from Scene import Scene
 import numpy as np
 
-
+#przykładowe dane dla obrazów z matlaba dog.jpg i desk.png
 def get_dog_pic():
     image = Image.open('dog.jpg')
 

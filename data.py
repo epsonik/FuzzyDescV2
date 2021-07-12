@@ -4,10 +4,14 @@ from Lev3 import Lev3
 import numpy as np
 
 marg = 0.2
+# daleko
 inf = 100
+# próg bliskości drugiego obiektu
 near = 2
+# granica wykrywania
 far = 4
 
+# lev1 estymacja pozycji rozmytych
 
 def load_etykiety():
     class Fuzzy:
@@ -77,6 +81,7 @@ def load_etykiety():
 
     fuzzy.lev1 = lev1
 
+    # estymacja położenia rozmytego  obiektu wzdłuż jednej osi (1D)
     level2List = {}
     level2List[0] = Lev2(
         name="far",
@@ -175,8 +180,9 @@ def load_etykiety():
                      [0, 0, 0, 0, 0, 0, 0, cl_rb, cl_rb, cl_rb],
                      [0, 0, 0, 0, 0, 0, 0, 0, ne_rb, ne_rb],
                      [0, 0, 0, 0, 0, 0, 0, 0, 0, fa_rb]])
-
     fuzzy.fam2 = fam2
+    # poziom 3 - estymacja rozmyta położenia obiektu w przestrzeni 2D
+    #deskryptory pozycji
     fa = 0
     ne = 1
     cl = 2
