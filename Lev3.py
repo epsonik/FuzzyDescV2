@@ -1,3 +1,4 @@
+# obiekt fuzyfikacji dla obiektu 2d
 class Lev3():
     def __init__(self, maxt, type, tsal, tname, orientation, osal, oname):
         if maxt is None:

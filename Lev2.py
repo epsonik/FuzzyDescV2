@@ -1,6 +1,7 @@
 from Lev1 import Type
 
 
+# obiekt fuzyfikacji dla jedenj osi
 class Lev2():
     def __init__(self, name, type, variant):
         if name is None:

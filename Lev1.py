@@ -11,6 +11,7 @@ class Type(Enum):
     A = "Above"
 
 
+# obiekt fuzyfikacji dla punktow
 class Lev1():
     def __init__(self, name, type, variant, thr):
         if name is None:

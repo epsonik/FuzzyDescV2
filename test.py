@@ -5,7 +5,7 @@ from PIL import Image
 # from YOLO.img_det import vbox_engine, draw_boxes
 from itertools import repeat
 from data import load_etykiety
-from helper import convert_gtruth, fmpm, get_predicates, sort_predicates, verbalize_pred
+from helper import fmpm, get_predicates, sort_predicates, verbalize_pred
 from pics import get_dog_pic, get_desk_pic
 import numpy as np
 
@@ -43,8 +43,8 @@ def from_pic(input_filename):
 # input_filename = "7775781830_e93c63f661_z.jpg"
 
 # gtruth = from_pic(input_filename)
-gtruth = get_desk_pic()
-# gtruth = get_dog_pic()
+# gtruth = get_desk_pic()
+gtruth = get_dog_pic()
 fuzzy = load_etykiety(
 )
 fmpm_mat = fmpm(gtruth, fuzzy)
