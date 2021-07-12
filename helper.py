@@ -2,7 +2,15 @@ import numpy as np
 import pandas as pd
 
 
+# macierz FMP dla danej sceny
+# arg. wej:
+#  scene - dane sceny (tu mamy dane o bounding boxach)
+#  fuzzy - paramtery rozmyte
+#  macierz wyjsciowa:
+#  wiersze - obiekty referencyjne - względem nich określamy położenie
+#  kolumny - obiekty dla których określamy położenie
 def fmpm(scene, fuzzy):
+    # liczba obiektow
     obj_num = scene.obj_num
     out = np.zeros((np.amax(fuzzy.fam3) + 1, obj_num, obj_num))
     for i in range(obj_num):
@@ -41,11 +49,6 @@ def get_fuzzy_pos(scene, refobj, curobj, fuzzy):
     return xy_fuz
 
 
-def convert_gtruth(gTruth):
-    scene = None
-    return scene
-
-
 def fuzzify(val, fuz):
     len_fuz = len(fuz)
     outval = np.zeros(len_fuz)
@@ -55,6 +58,10 @@ def fuzzify(val, fuz):
     return outval
 
 
+# trapezoidalna funkcja przynaleznosci
+# arg. wej:
+# val - liczba
+# fval - param.trapezoidu (a,b,c,d)
 def mf(val, fval):
     if (val < fval[0]):
         out = 0
@@ -69,8 +76,14 @@ def mf(val, fval):
     return float("{:.4f}".format(out))
 
 
+#  macierzy skojarzen rozmytych
+# arg.wej.:
+# fval1,fval2 - wektory wartosci rozmytych wejsciowych,
+# fam_matrix - macierz skojarzen rozmytych
+# wyj:
+# outval - wektor wyjsciowych wartosci rozmytych
 def fam(fval1, fval2, fam_matrix):
-    outval = np.zeros(np.amax(fam_matrix) +1)
+    outval = np.zeros(np.amax(fam_matrix) + 1)
     for i in range(len(fval1)):
         for j in range(len(fval2)):
             minval = min(fval1[i], fval2[j])

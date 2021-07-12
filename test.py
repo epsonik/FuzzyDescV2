@@ -2,7 +2,7 @@ import copy
 
 from Scene import Scene
 from PIL import Image
-from YOLO.img_det import vbox_engine, draw_boxes
+# from YOLO.img_det import vbox_engine, draw_boxes
 from itertools import repeat
 from data import load_etykiety
 from helper import convert_gtruth, fmpm, get_predicates, sort_predicates, verbalize_pred
@@ -40,10 +40,10 @@ def from_pic(input_filename):
 
 
 # Prints in the console the variable as requested
-input_filename = "7775781830_e93c63f661_z.jpg"
+# input_filename = "7775781830_e93c63f661_z.jpg"
 
-gtruth = from_pic(input_filename)
-# gtruth = get_desk_pic()
+# gtruth = from_pic(input_filename)
+gtruth = get_desk_pic()
 # gtruth = get_dog_pic()
 fuzzy = load_etykiety(
 )
