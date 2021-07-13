@@ -5,7 +5,7 @@ from PIL import Image
 # from YOLO.img_det import vbox_engine, draw_boxes
 from itertools import repeat
 
-from YOLO.img_det import vbox_engine
+from YOLO.img_det import vbox_engine, draw_boxes
 from data import load_etykiety
 from helper import fmpm, get_predicates, sort_predicates, verbalize_pred
 from pics import get_dog_pic, get_desk_pic
@@ -16,12 +16,11 @@ def from_pic(input_filename):
     input_filename = str(input_filename)
     print("The file name you entered is: ", input_filename)
     photo_boxed_filename = input_filename.replace('.jpg', '_boxed.jpg')
-    v_boxes, v_labels, v_scores, image_w, image_h = vbox_engine(input_filename, photo_boxed_filename)
+    v_boxes, v_labels, v_scores, image_w, image_h, v_labels_sequential = vbox_engine(input_filename, photo_boxed_filename)
 
     image = Image.open(input_filename)
 
     size = image.size
-    # onames = ['scene', 'dog', 'bike', 'car']
     onames = v_labels
     obj_num = len(v_boxes)
     ocolors = []
@@ -35,7 +34,7 @@ def from_pic(input_filename):
     scene = Scene(im=im, fname=input_filename, size=size, onames=onames, ocols=ocolors, obj=obj, obj_num=obj_num,
                   obj_org=obj_org,
                   background=background, background2=background2)
-    return scene
+    return scene, v_labels_sequential
 
 # process_for_grouping()
 # input_filename = input("Enter a file name to load bBoxes. Data must be delimited with ',': ")
@@ -43,8 +42,8 @@ def from_pic(input_filename):
 
 # Prints in the console the variable as requested
 input_filename = "6813627120_a222bcba0d_z.jpg"
-
-gtruth = from_pic(input_filename)
+photo_boxed_filename = input_filename.replace('.jpg', '_boxed.jpg')
+gtruth, v_labels_sequential = from_pic(input_filename)
 # gtruth = get_desk_pic()
 # gtruth = get_dog_pic()
 fuzzy = load_etykiety()
@@ -55,3 +54,6 @@ pred = get_predicates(fmpm_mat, gtruth, fuzzy)
 pred_sort = sort_predicates(pred, gtruth, fuzzy, [1, 5, 8, 3])
 #
 print(verbalize_pred(pred_sort, gtruth, fuzzy))
+
+draw_boxes(input_filename, photo_boxed_filename, gtruth.obj, v_labels_sequential)
+

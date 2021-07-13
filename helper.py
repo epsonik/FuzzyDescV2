@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 
-
 # macierz FMP dla danej sceny
 # arg. wej:
 #  scene - dane sceny (tu mamy dane o bounding boxach)
@@ -9,6 +8,9 @@ import pandas as pd
 #  macierz wyjsciowa:
 #  wiersze - obiekty referencyjne - względem nich określamy położenie
 #  kolumny - obiekty dla których określamy położenie
+from YOLO.img_det import draw_boxes
+
+
 def fmpm(scene, fuzzy):
     # liczba obiektow
     obj_num = scene.obj_num
@@ -161,12 +163,13 @@ def verbalize_pred(pred, scene, fuzzy):
         tname_curr = fuzzy.lev3.tname[ty]
         first = scene.onames[scene.obj[int(curr_pred[0]), 1]]
         second = scene.onames[scene.obj[int(curr_pred[2]), 1]]
-        txt = txt.__add__(" object {} {} : {} {} rel. to {} {} ({})\n".format(curr_pred[0] - zerolab,
+        txt = txt.__add__(" object {} {} : {} {} rel. to {} {} ({})\n".format(pred[i, 0] - zerolab,
                                                                               first,
                                                                               tname_curr, oname_curr,
-                                                                              curr_pred[2] - zerolab,
+                                                                              pred[i, 2] - zerolab,
                                                                               second,
                                                                               curr_pred[9]))
+
     return txt
 
 
