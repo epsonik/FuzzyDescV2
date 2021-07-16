@@ -41,7 +41,7 @@ def from_pic(input_filename):
 
 
 # Prints in the console the variable as requested
-input_filename = "6813627120_a222bcba0d_z.jpg"
+input_filename = "images/6813627120_a222bcba0d_z.jpg"
 photo_boxed_filename = input_filename.replace('.jpg', '_boxed.jpg')
 gtruth, v_labels_sequential = from_pic(input_filename)
 # gtruth = get_desk_pic()

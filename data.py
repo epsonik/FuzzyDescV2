@@ -11,6 +11,7 @@ near = 2
 # granica wykrywania
 far = 4
 
+
 # lev1 estymacja pozycji rozmytych
 
 def load_etykiety():
@@ -182,7 +183,7 @@ def load_etykiety():
                      [0, 0, 0, 0, 0, 0, 0, 0, 0, fa_rb]])
     fuzzy.fam2 = fam2
     # poziom 3 - estymacja rozmyta położenia obiektu w przestrzeni 2D
-    #deskryptory pozycji
+    # deskryptory pozycji
     fa = 0
     ne = 1
     cl = 2
@@ -259,3 +260,7 @@ def load_etykiety():
     fuzzy.fam3 = fam3
 
     return fuzzy
+
+
+def get_field_size():
+    return 640, 480

@@ -5,9 +5,9 @@ import cv2
 import numpy as np
 
 from DrawField import draw_field
-from InputData import input_data, get_field_size
 from Obj import Obj
 from SceneDescription import scene_description, show_image
+from data import get_field_size
 
 
 def _interactive_mode():
@@ -24,6 +24,7 @@ def _interactive_mode():
         cv2.imshow("image", image)
         if ref_points.__len__() > 1:
             _calculate_pos(ref_points)
+
     def adj_x(corner, n):
         corner_l = list(corner)
         corner_l[0] += n
@@ -43,6 +44,7 @@ def _interactive_mode():
         corner_l = list(corner)
         corner_l[1] += n
         return tuple(corner_l)
+
     clone = image.copy()
     cv2.namedWindow("image")
 
@@ -106,8 +108,8 @@ def _interactive_mode():
         elif key == ord("s"):
             ref_points[actual_rectangle_idx] = actual_rectangle
 
-            actual_rectangle[0] = adj_y(actual_rectangle[0],5)
-            actual_rectangle[1] = adj_y(actual_rectangle[1],5)
+            actual_rectangle[0] = adj_y(actual_rectangle[0], 5)
+            actual_rectangle[1] = adj_y(actual_rectangle[1], 5)
             image = clone.copy()
             # draw a rectangle around the region of interest
             show_rectangles()
