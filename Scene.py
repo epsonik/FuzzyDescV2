@@ -9,7 +9,11 @@ class Scene():
                  obj_org,
                  background,
                  background2):
+        if fname is None:
+            self.fname = ""
         self.fname = fname
+        if im is None:
+            self.im = None
         self.im = im
         self.size = size
         self.onames = onames

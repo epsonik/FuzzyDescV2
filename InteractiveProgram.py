@@ -1,13 +1,14 @@
 # import the necessary packages
+import copy
 import csv
+from itertools import repeat
 
 import cv2
 import numpy as np
 
-from DrawField import draw_field
-from Obj import Obj
-from SceneDescription import scene_description, show_image
+from Scene import Scene
 from data import get_field_size
+from helper import generate_description
 
 
 def _interactive_mode():
@@ -182,27 +183,34 @@ def save_b_boxes(ref_points):
 
 
 def _calculate_pos(ref_points):
-    v_boxes = {}
+    v_boxes = []
+    image_w, image_h = get_field_size()
+    v_labels = ['scene']
+    b = [0, 0, 10, 10, image_w, image_h]
+    v_boxes.append(b)
     for index, ref_point in enumerate(ref_points):
         XtopLeft, YtopLeft = ref_point[0][0], ref_point[0][1]
         XbottomRight, YbottomRight = ref_point[1][0], ref_point[1][1]
 
-        X_len = abs(XbottomRight - XtopLeft)
-        Y_len = abs(YbottomRight - YtopLeft)
-        obj = Obj(str(index), [YtopLeft, XtopLeft], [Y_len, X_len])
+        width = abs(XbottomRight - XtopLeft)
+        height = abs(YbottomRight - YtopLeft)
+        b = [str(index), str(index), XtopLeft, YtopLeft, width, height]
+        v_boxes.append(b)
+        v_labels.append(str(index))
 
-        v_boxes[index] = obj
-    create_bound_boxes, create_prop, create_rels, create_rules, get_field_size = input_data()
-    description = scene_description(v_boxes, create_prop, create_rels, create_rules, get_field_size)
-    print(description)
+    onames = v_labels
+    obj_num = len(v_boxes)
+    ocolors = []
+    ocolors.extend(repeat([1, 1, 1], obj_num))
+    obj = np.array(v_boxes)
 
-
-def create_output_image_and_desc():
-    create_bound_boxes, create_prop, create_rels, create_rules, get_field_size = input_data()
-    description = scene_description(create_bound_boxes, create_prop, create_rels, create_rules, get_field_size)
-    print(description)
-    imf = draw_field(create_bound_boxes, get_field_size, -1, 1)
-    show_image(imf)
+    obj_org = copy.copy(obj)
+    background = []
+    background2 = []
+    scene = Scene(im=None, fname=None, size=get_field_size(), onames=onames, ocols=ocolors, obj=obj, obj_num=obj_num,
+                  obj_org=obj_org,
+                  background=background, background2=background2)
+    print(generate_description(scene))
 
 
 _interactive_mode()

@@ -9,6 +9,7 @@ import pandas as pd
 #  wiersze - obiekty referencyjne - względem nich określamy położenie
 #  kolumny - obiekty dla których określamy położenie
 from YOLO.img_det import draw_boxes
+from data import load_etykiety
 
 
 def fmpm(scene, fuzzy):
@@ -173,6 +174,8 @@ def verbalize_pred(pred, scene, fuzzy):
     return txt
 
 
+
+
 def show_bboxes(scene, showmode, currobj):
     # showmode = 0 wyswietla same BB
     # = 1 wyswietla obraz orygialny i BB
@@ -208,3 +211,13 @@ def show_bboxes(scene, showmode, currobj):
     # im = insertObjectAnnotation(im,'rectangle',scene.obj(:,3:6),labels,'Color',colors ,...
     #       'TextBoxOpacity',0.7,'FontSize',max(floor(min(scene.size)/40),8),'LineWidth',3);
     return None
+
+
+
+def generate_description(gtruth):
+    fuzzy = load_etykiety()
+    fmpm_mat = fmpm(gtruth, fuzzy)
+
+    pred = get_predicates(fmpm_mat, gtruth, fuzzy)
+    pred_sort = sort_predicates(pred, gtruth, fuzzy, [1, 5, 8, 3])
+    return verbalize_pred(pred_sort, gtruth, fuzzy)
