@@ -194,7 +194,7 @@ def _calculate_pos(ref_points):
 
         width = abs(XbottomRight - XtopLeft)
         height = abs(YbottomRight - YtopLeft)
-        b = [str(index), str(index), XtopLeft, YtopLeft, width, height]
+        b = [index, index, XtopLeft, YtopLeft, width, height]
         v_boxes.append(b)
         v_labels.append(str(index))
 
