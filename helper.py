@@ -174,46 +174,6 @@ def verbalize_pred(pred, scene, fuzzy):
     return txt
 
 
-
-
-def show_bboxes(scene, showmode, currobj):
-    # showmode = 0 wyswietla same BB
-    # = 1 wyswietla obraz orygialny i BB
-    # = 2 wyswietla wycięte BB (tło - rozmyty obr. pocz.)
-    # = 3 wyswietla wycięte BB (tło białe)
-    labels = np.zeros((scene.obj_num[0], 1), np.uint8)
-    if scene.im is not None:
-        showmode = 0
-    if showmode == 0:
-        im = np.ones((scene.size[0], scene.size[1], 3), np.uint8)
-    elif showmode == 1:
-        im = scene.im
-    # else:
-    #     if showmode == 2:
-    #         im = scene.background
-    #     else:
-    #         im = scene.background2
-    #     ordered_obj = 1:scene.obj_num
-    #     if currobj > 0
-    #         ordered_obj(scene.obj_num) = currobj
-    #         ordered_obj(currobj) = scene.obj_num
-    #     for i=2:scene.obj_num
-    #         objnum = ordered_obj(i)
-    #         upleft = [scene.obj(objnum,4) scene.obj(objnum,3)];
-    #         downright = upleft + [scene.obj(objnum,6)-1 scene.obj(objnum,5)-1]
-    #         rescalled = imresize(scene.images{objnum}, [scene.obj(objnum,6) scene.obj(objnum,5)])
-    #         rescalled = rescalled(1:scene.obj(objnum,6),1:scene.obj(objnum,5),:)
-    #         im(upleft(1):downright(1),upleft(2):downright(2),:) = rescalled
-    # colors = []
-    # for i in range(scene.obj_num):
-    #     labels{i} = [num2str(i-1) ':' char(scene.onames(scene.obj(i,2),:)) ];
-    #     colors = [colors; scene.ocols(scene.obj(i,2),:)*255];
-    # im = insertObjectAnnotation(im,'rectangle',scene.obj(:,3:6),labels,'Color',colors ,...
-    #       'TextBoxOpacity',0.7,'FontSize',max(floor(min(scene.size)/40),8),'LineWidth',3);
-    return None
-
-
-
 def generate_description(gtruth):
     fuzzy = load_etykiety()
     fmpm_mat = fmpm(gtruth, fuzzy)

@@ -8,7 +8,7 @@ import numpy as np
 
 #przykładowe dane dla obrazów z matlaba dog.jpg i desk.png
 def get_dog_pic():
-    image = Image.open('dog.jpg')
+    image = Image.open('images/dog.jpg')
 
     size = image.size
     # from matlab
@@ -36,7 +36,7 @@ def get_dog_pic():
 
 
 def get_desk_pic():
-    image = Image.open('desk.png')
+    image = Image.open('images/desk.png')
 
     size = image.size
     # from matlab
