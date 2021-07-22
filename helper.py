@@ -14,8 +14,9 @@ from YOLO.img_det import draw_boxes
 from data import *
 
 LANGUAGE = 1
-BIERNIK = 2
-NARZEDNIK = 3
+BIERNIK = 3
+NARZEDNIK = 4
+
 
 def fmpm(scene, fuzzy):
     # liczba obiektow
@@ -182,6 +183,7 @@ def verbalize_pred(pred, scene, fuzzy):
 
 stykac = "{} styka się z {}"
 nachodzic = "{} nachodzi na {}"
+blisko = "{} jest blisko {}"
 
 
 def verbalize_pred_pl(pred, scene, fuzzy):
@@ -230,6 +232,25 @@ def verbalize_pred_pl(pred, scene, fuzzy):
                 if (oname_curr == RIGHT):
                     txt = txt.__add__(" po prawej")
             if (tname_curr is CROSSING):
+                txt = txt.__add__(nachodzic.format(find_name(data_multilingual_obj_names, second_obj_name)[LANGUAGE],
+                                                   find_name(data_multilingual_obj_names, first_obj_name)[BIERNIK]))
+                if (oname_curr == ABOVE):
+                    txt = txt.__add__(" od góry")
+                if (oname_curr == LEFT_ABOVE):
+                    txt.__add__(" w lewym górnym rogu")
+                if (oname_curr == RIGHT_ABOVE):
+                    txt = txt.__add__(" w prawym górnym rogu")
+                if (oname_curr == BELOW):
+                    txt.__add__(" od dołu")
+                if (oname_curr == LEFT_BELOW):
+                    txt = txt.__add__(" w lewym dolnym rogu")
+                if (oname_curr == RIGHT_BELOW):
+                    txt = txt.__add__(" w prawym dolnym rogu")
+                if (oname_curr == LEFT):
+                    txt = txt.__add__(" po lewej")
+                if (oname_curr == RIGHT):
+                    txt = txt.__add__(" po prawej")
+            if (tname_curr is CLOSE):
                 txt = txt.__add__(nachodzic.format(find_name(data_multilingual_obj_names, second_obj_name)[LANGUAGE],
                                                    find_name(data_multilingual_obj_names, first_obj_name)[BIERNIK]))
                 if (oname_curr == ABOVE):
