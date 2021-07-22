@@ -8,7 +8,7 @@ import numpy as np
 
 from Scene import Scene
 from data import get_field_size
-from helper import generate_description
+from helper import generate_description, verbalize_pred_pl, verbalize_pred
 
 
 def _interactive_mode():
@@ -210,7 +210,8 @@ def _calculate_pos(ref_points):
     scene = Scene(im=None, fname=None, size=get_field_size(), onames=onames, ocols=ocolors, obj=obj, obj_num=obj_num,
                   obj_org=obj_org,
                   background=background, background2=background2)
-    print(generate_description(scene))
+    pred_sort, gtruth, fuzzy = generate_description(scene)
+    print(verbalize_pred(pred_sort, gtruth, fuzzy))
 
 
 _interactive_mode()

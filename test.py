@@ -2,14 +2,12 @@ import copy
 
 from Scene import Scene
 from PIL import Image
-# from YOLO.img_det import vbox_engine, draw_boxes
 from itertools import repeat
 
 from YOLO.img_det import vbox_engine, draw_boxes
-from data import load_etykiety
-from helper import fmpm, get_predicates, sort_predicates, verbalize_pred, generate_description
-from pics import get_dog_pic, get_desk_pic
 import numpy as np
+
+from helper import generate_description, verbalize_pred_pl, verbalize_pred
 
 
 def from_pic(input_filename):
@@ -38,17 +36,16 @@ def from_pic(input_filename):
     return scene, v_labels_sequential
 
 
-
-
-
 # process_for_grouping()
 # input_filename = input("Enter a file name to load bBoxes. Data must be delimited with ',': ")
 
 
 # Prints in the console the variable as requested
-input_filename = "images/6813627120_a222bcba0d_z.jpg"
+
+input_filename = "images/desk.jpg"
 photo_boxed_filename = input_filename.replace('.jpg', '_boxed.jpg')
 gtruth, v_labels_sequential = from_pic(input_filename)
-description = generate_description(gtruth)
-
+pred_sort, gtruth, fuzzy = generate_description(gtruth)
+print(verbalize_pred_pl(pred_sort, gtruth, fuzzy))
+print(verbalize_pred(pred_sort, gtruth, fuzzy))
 draw_boxes(input_filename, photo_boxed_filename, gtruth.obj, v_labels_sequential)

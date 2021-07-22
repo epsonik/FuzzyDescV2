@@ -2,6 +2,8 @@ from Lev1 import Lev1, Type
 from Lev2 import Lev2
 from Lev3 import Lev3
 import numpy as np
+from texts import *
+
 
 marg = 0.2
 # daleko
@@ -20,21 +22,21 @@ def load_etykiety():
 
     fuzzy = Fuzzy()
     lev1 = {}
-    lev1[0] = Lev1(name=["far left", "far above"], type=Type.F, variant=[Type.L, Type.A],
+    lev1[0] = Lev1(name=[FAR_LEFT, FAR_ABOVE], type=Type.F, variant=[Type.L, Type.A],
                    thr=[-inf, -inf, -far - marg, -far + marg])
 
-    lev1[1] = Lev1(name=["near left", "near above"], type=Type.N, variant=[Type.L, Type.A],
+    lev1[1] = Lev1(name=[NEAR_LEFT, NEAR_ABOVE], type=Type.N, variant=[Type.L, Type.A],
                    thr=[-far - marg, -far + marg, -near - marg, -near + marg])
 
     lev1[2] = Lev1(
-        name=["close left", "close above"],
+        name=[CLOSE_LEFT, CLOSE_ABOVE],
         type=Type.C,
         variant=[Type.L, Type.A],
         thr=[-near - marg, -near + marg, -1 - 2 * marg, -1])
 
     lev1[3] = Lev1(
 
-        name=["edge left", "edge above"],
+        name=[EDGE_LEFT, EDGE_ABOVE],
 
         type="E",
 
@@ -42,13 +44,13 @@ def load_etykiety():
 
         thr=[-1 - 2 * marg, -1, -1, -1 + 2 * marg])
     lev1[4] = Lev1(
-        name=["inside left", "inside above"],
+        name=[INSIDE_LEFT, INSIDE_ABOVE],
         type="I",
         variant=["L", "A"],
         thr=[-1, -1 + 2 * marg, -marg, marg])
 
     lev1[5] = Lev1(
-        name=["inside right", "inside below"],
+        name=[INSIDE_RIGHT, INSIDE_BELOW],
 
         type="I",
 
@@ -57,25 +59,25 @@ def load_etykiety():
         thr=[-marg, marg, 1 - 2 * marg, 1])
 
     lev1[6] = Lev1(
-        name=["edge right", "edge below"],
+        name=[EDGE_RIGHT, EDGE_BELOW],
         type="E",
         variant=["R", "B"],
         thr=[1 - 2 * marg, 1, 1, 1 + 2 * marg])
 
     lev1[7] = Lev1(
-        name=["close right", "close below"],
+        name=[CLOSE_RIGHT, CLOSE_BELOW],
         type="C",
         variant=["R", "B"],
         thr=[1, 1 + 2 * marg, near - marg, near + marg])
 
     lev1[8] = Lev1(
-        name=["near right", "near below"],
+        name=[NEAR_RIGHT, NEAR_BELOW],
         type="N",
         variant=["R", "B"],
 
         thr=[near - marg, near + marg, far - marg, far + marg])
     lev1[9] = Lev1(
-        name=["far right", "far below"],
+        name=[FAR_RIGHT, FAR_BELOW],
         type="F",
         variant=["R", "B"],
         thr=[far - marg, far + marg, inf, inf])
@@ -85,32 +87,32 @@ def load_etykiety():
     # estymacja położenia rozmytego  obiektu wzdłuż jednej osi (1D)
     level2List = {}
     level2List[0] = Lev2(
-        name="far",
+        name=FAR,
         type="FA",
         variant=["L", "A"])
 
     level2List[1] = Lev2(
-        name="near",
+        name=NEAR,
         type="NE",
         variant=["L", "A"])
 
     level2List[2] = Lev2(
-        name="close",
+        name=CLOSE,
         type="CL",
         variant=["L", "A"])
 
     level2List[3] = Lev2(
-        name="touching",
+        name=TOUCHING,
         type="TO",
         variant=["L", "A"])
 
     level2List[4] = Lev2(
-        name="crossing",
+        name=CROSSING,
         type="CR",
         variant=["L", "A"])
 
     level2List[5] = Lev2(
-        name="inside",
+        name=INSIDE,
         type="IN",
         variant=["L", "A"])
 
@@ -119,38 +121,38 @@ def load_etykiety():
         type="SH",
         variant=["LR", "AB"])
     level2List[7] = Lev2(
-        name="same",
+        name=SAME,
         type="SM",
         variant=["LR", "AB"])
     level2List[8] = Lev2(
-        name="longer",
+        name=LONGER,
         type="LO",
         variant=["LR", "AB"])
 
     level2List[9] = Lev2(
-        name="inside",
+        name=INSIDE,
         type="IN",
         variant=["R", "B"])
     level2List[10] = Lev2(
-        name="crossing",
+        name=CROSSING,
         type="CR",
         variant=["R", "B"])
     level2List[11] = Lev2(
-        name="touching",
+        name=TOUCHING,
         type="TO",
         variant=["R", "B"])
     level2List[12] = Lev2(
-        name="close",
+        name=CLOSE,
         type="CL",
         variant=["R", "B"])
 
     level2List[13] = Lev2(
-        name="near",
+        name=NEAR,
         type="NE",
         variant=["R", "B"])
 
     level2List[14] = Lev2(
-        name="far",
+        name=FAR,
         type="FA",
         variant=["R", "B"])
 
@@ -197,7 +199,7 @@ def load_etykiety():
     lev3 = Lev3(maxt=10,
                 type=['FA', 'NE', 'CL', 'TO', 'CR', 'IN', 'LG', 'SP', 'SA'],
                 tsal=[0.6, 0.7, 0.8, 0.9, 0.9, 0.8, 0.3, 0.9, 1],
-                tname=['far', 'near', 'close', 'touching', 'crossing', 'inside', 'larger', 'split', 'same'],
+                tname=[FAR, NEAR, CLOSE, TOUCHING, CROSSING, INSIDE, LARGER, SPLIT, SAME],
                 orientation=None, osal=None, oname=None)
 
     mt = lev3.maxt
@@ -218,8 +220,8 @@ def load_etykiety():
 
     lev3.osal = [0.9, 0.8, 0.9, 0.8, 0.9, 0.8, 0.9, 0.8, 1, 0.9, 0.9]
 
-    lev3.oname = ['left', 'left-above', 'above', 'right-above', 'right', 'right-below', 'below', 'left-below',
-                  'centered', 'horizontal', 'vertical']
+    lev3.oname = [LEFT, LEFT_ABOVE, ABOVE, RIGHT_ABOVE, RIGHT, RIGHT_BELOW, BELOW, LEFT_BELOW,
+                  CENTERED, HORIZONTAL, VERTICAL]
 
     fuzzy.lev3 = lev3
 

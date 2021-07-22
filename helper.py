@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 import pandas as pd
 
@@ -9,8 +11,11 @@ import pandas as pd
 #  wiersze - obiekty referencyjne - względem nich określamy położenie
 #  kolumny - obiekty dla których określamy położenie
 from YOLO.img_det import draw_boxes
-from data import load_etykiety
+from data import *
 
+LANGUAGE = 1
+BIERNIK = 2
+NARZEDNIK = 3
 
 def fmpm(scene, fuzzy):
     # liczba obiektow
@@ -156,21 +161,116 @@ def sort_predicates(pred, scene, fuzzy, order):
 def verbalize_pred(pred, scene, fuzzy):
     zerolab = 1
     txt = ""
+
     for i in range(len(pred)):
         curr_pred = pred[i, :]
         ty = int(curr_pred[4])
+        tname_curr = fuzzy.lev3.tname[ty]
+
         o = int(curr_pred[6])
         oname_curr = fuzzy.lev3.oname[o]
-        tname_curr = fuzzy.lev3.tname[ty]
-        first = scene.onames[scene.obj[int(curr_pred[0]), 1]]
-        second = scene.onames[scene.obj[int(curr_pred[2]), 1]]
+        first_obj_name = scene.onames[scene.obj[int(curr_pred[0]), 1]]
+        second_obj_name = scene.onames[scene.obj[int(curr_pred[2]), 1]]
         txt = txt.__add__(" object {} {} : {} {} rel. to {} {} ({})\n".format(pred[i, 0] - zerolab,
-                                                                              first,
+                                                                              first_obj_name,
                                                                               tname_curr, oname_curr,
                                                                               pred[i, 2] - zerolab,
-                                                                              second,
+                                                                              second_obj_name,
                                                                               curr_pred[9]))
+    return txt
 
+
+stykac = "{} styka się z {}"
+nachodzic = "{} nachodzi na {}"
+
+
+def verbalize_pred_pl(pred, scene, fuzzy):
+    zerolab = 1
+    txt = ""
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "yolov3_PL.csv")
+    data_multilingual_obj_names = pd.read_csv(data_path, delimiter=', ', engine='python').values
+
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "texts_odmiana.csv")
+    data_multilingual_positions = pd.read_csv(data_path, delimiter=', ', engine='python').values
+
+    def find_name(data, name):
+        return data[data[:, 0] == name, :][0]
+
+    for i in range(len(pred)):
+        curr_pred = pred[i, :]
+        ty = int(curr_pred[4])
+        tname_curr = fuzzy.lev3.tname[ty]
+
+        o = int(curr_pred[6])
+        oname_curr = fuzzy.lev3.oname[o]
+        first_obj_name = scene.onames[scene.obj[int(curr_pred[0]), 1]]
+        second_obj_name = scene.onames[scene.obj[int(curr_pred[2]), 1]]
+        if second_obj_name != "scene":
+            if (tname_curr is TOUCHING):
+                # txt = txt.__add__("{} {} {} {}\n".format(find_name(data_multilingual_obj_names, first_obj_name)[LANGUAGE],
+                #                                        find_name(data_multilingual_positions, tname_curr)[LANGUAGE],
+                #                                        find_name(data_multilingual_obj_names, second_obj_name)[LANGUAGE],
+                #                                        find_name(data_multilingual_positions, oname_curr)[LANGUAGE]))
+                txt = txt.__add__(stykac.format(find_name(data_multilingual_obj_names, second_obj_name)[LANGUAGE],
+                                                find_name(data_multilingual_obj_names, first_obj_name)[NARZEDNIK]))
+                if (oname_curr == ABOVE):
+                    txt = txt.__add__(" od góry")
+                if (oname_curr == LEFT_ABOVE):
+                    txt = txt.__add__(" w lewym górnym rogu")
+                if (oname_curr == RIGHT_ABOVE):
+                    txt = txt.__add__(" w prawym górnym rogu")
+                if (oname_curr == BELOW):
+                    txt = txt.__add__(" od dołu")
+                if (oname_curr == LEFT_BELOW):
+                    txt = txt.__add__(" w lewym dolnym rogu")
+                if (oname_curr == RIGHT_BELOW):
+                    txt = txt.__add__(" w prawym dolnym rogu")
+                if (oname_curr == LEFT):
+                    txt = txt.__add__(" po lewej")
+                if (oname_curr == RIGHT):
+                    txt = txt.__add__(" po prawej")
+            if (tname_curr is CROSSING):
+                txt = txt.__add__(nachodzic.format(find_name(data_multilingual_obj_names, second_obj_name)[LANGUAGE],
+                                                   find_name(data_multilingual_obj_names, first_obj_name)[BIERNIK]))
+                if (oname_curr == ABOVE):
+                    txt = txt.__add__(" od góry")
+                if (oname_curr == LEFT_ABOVE):
+                    txt.__add__(" w lewym górnym rogu")
+                if (oname_curr == RIGHT_ABOVE):
+                    txt = txt.__add__(" w prawym górnym rogu")
+                if (oname_curr == BELOW):
+                    txt.__add__(" od dołu")
+                if (oname_curr == LEFT_BELOW):
+                    txt = txt.__add__(" w lewym dolnym rogu")
+                if (oname_curr == RIGHT_BELOW):
+                    txt = txt.__add__(" w prawym dolnym rogu")
+                if (oname_curr == LEFT):
+                    txt = txt.__add__(" po lewej")
+                if (oname_curr == RIGHT):
+                    txt = txt.__add__(" po prawej")
+            txt = txt.__add__("\n")
+    return txt
+
+
+def verbalize_pred_eng(pred, scene, fuzzy):
+    zerolab = 1
+    txt = ""
+
+    for i in range(len(pred)):
+        curr_pred = pred[i, :]
+        ty = int(curr_pred[4])
+        tname_curr = fuzzy.lev3.tname[ty]
+
+        o = int(curr_pred[6])
+        oname_curr = fuzzy.lev3.oname[o]
+        first_obj_name = scene.onames[scene.obj[int(curr_pred[0]), 1]]
+        second_obj_name = scene.onames[scene.obj[int(curr_pred[2]), 1]]
+        txt = txt.__add__(" object {} {} : {} {} rel. to {} {} ({})\n".format(pred[i, 0] - zerolab,
+                                                                              first_obj_name,
+                                                                              tname_curr, oname_curr,
+                                                                              pred[i, 2] - zerolab,
+                                                                              second_obj_name,
+                                                                              curr_pred[9]))
     return txt
 
 
@@ -180,4 +280,4 @@ def generate_description(gtruth):
 
     pred = get_predicates(fmpm_mat, gtruth, fuzzy)
     pred_sort = sort_predicates(pred, gtruth, fuzzy, [1, 5, 8, 3])
-    return verbalize_pred(pred_sort, gtruth, fuzzy)
+    return pred_sort, gtruth, fuzzy
