@@ -1,4 +1,5 @@
 import os
+from collections import Counter
 
 import numpy as np
 import pandas as pd
@@ -13,7 +14,8 @@ import pandas as pd
 from YOLO.img_det import draw_boxes
 from data import *
 
-LANGUAGE = 1
+PL = 1
+EN = 0
 BIERNIK = 3
 NARZEDNIK = 4
 
@@ -181,22 +183,30 @@ def verbalize_pred(pred, scene, fuzzy):
     return txt
 
 
-stykac = "{} styka się z {}"
-nachodzic = "{} nachodzi na {}"
-blisko = "{} jest blisko {}"
-
-
-def verbalize_pred_pl(pred, scene, fuzzy):
+def verbalize_pred_pl(pred, scene, fuzzy, v_labels_sequential):
+    touching = "{} styka się z {}"
+    crossing = "{} nachodzi na {}"
+    close_to = "{} jest blisko {}"
+    gen_desc = "Na obrazie widzimy "
     zerolab = 1
-    txt = ""
+    txt = gen_desc
     data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "yolov3_PL.csv")
     data_multilingual_obj_names = pd.read_csv(data_path, delimiter=', ', engine='python').values
+
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "yolov3_PL_LM.csv")
+    data_multilingual_obj_names_lm = pd.read_csv(data_path, delimiter=', ', engine='python').values
 
     data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "texts_odmiana.csv")
     data_multilingual_positions = pd.read_csv(data_path, delimiter=', ', engine='python').values
 
-    def find_name(data, name):
-        return data[data[:, 0] == name, :][0]
+    image = Counter(v_labels_sequential)
+    for object_name in image.keys():
+        if image[object_name] > 1:
+            txt = txt.__add__("{}, ".format(find_name(data_multilingual_obj_names_lm, object_name)[3]))
+        else:
+            txt = txt.__add__("{}, ".format(find_name(data_multilingual_obj_names, object_name)[3]))
+
+    txt = txt.__add__("\n")
 
     for i in range(len(pred)):
         curr_pred = pred[i, :]
@@ -207,75 +217,100 @@ def verbalize_pred_pl(pred, scene, fuzzy):
         oname_curr = fuzzy.lev3.oname[o]
         first_obj_name = scene.onames[scene.obj[int(curr_pred[0]), 1]]
         second_obj_name = scene.onames[scene.obj[int(curr_pred[2]), 1]]
-        if second_obj_name != "scene":
-            if (tname_curr is TOUCHING):
-                # txt = txt.__add__("{} {} {} {}\n".format(find_name(data_multilingual_obj_names, first_obj_name)[LANGUAGE],
-                #                                        find_name(data_multilingual_positions, tname_curr)[LANGUAGE],
-                #                                        find_name(data_multilingual_obj_names, second_obj_name)[LANGUAGE],
-                #                                        find_name(data_multilingual_positions, oname_curr)[LANGUAGE]))
-                txt = txt.__add__(stykac.format(find_name(data_multilingual_obj_names, second_obj_name)[LANGUAGE],
-                                                find_name(data_multilingual_obj_names, first_obj_name)[NARZEDNIK]))
-                if (oname_curr == ABOVE):
-                    txt = txt.__add__(" od góry")
-                if (oname_curr == LEFT_ABOVE):
-                    txt = txt.__add__(" w lewym górnym rogu")
-                if (oname_curr == RIGHT_ABOVE):
-                    txt = txt.__add__(" w prawym górnym rogu")
-                if (oname_curr == BELOW):
-                    txt = txt.__add__(" od dołu")
-                if (oname_curr == LEFT_BELOW):
-                    txt = txt.__add__(" w lewym dolnym rogu")
-                if (oname_curr == RIGHT_BELOW):
-                    txt = txt.__add__(" w prawym dolnym rogu")
-                if (oname_curr == LEFT):
-                    txt = txt.__add__(" po lewej")
-                if (oname_curr == RIGHT):
-                    txt = txt.__add__(" po prawej")
-            if (tname_curr is CROSSING):
-                txt = txt.__add__(nachodzic.format(find_name(data_multilingual_obj_names, second_obj_name)[LANGUAGE],
-                                                   find_name(data_multilingual_obj_names, first_obj_name)[BIERNIK]))
-                if (oname_curr == ABOVE):
-                    txt = txt.__add__(" od góry")
-                if (oname_curr == LEFT_ABOVE):
-                    txt.__add__(" w lewym górnym rogu")
-                if (oname_curr == RIGHT_ABOVE):
-                    txt = txt.__add__(" w prawym górnym rogu")
-                if (oname_curr == BELOW):
-                    txt.__add__(" od dołu")
-                if (oname_curr == LEFT_BELOW):
-                    txt = txt.__add__(" w lewym dolnym rogu")
-                if (oname_curr == RIGHT_BELOW):
-                    txt = txt.__add__(" w prawym dolnym rogu")
-                if (oname_curr == LEFT):
-                    txt = txt.__add__(" po lewej")
-                if (oname_curr == RIGHT):
-                    txt = txt.__add__(" po prawej")
-            if (tname_curr is CLOSE):
-                txt = txt.__add__(nachodzic.format(find_name(data_multilingual_obj_names, second_obj_name)[LANGUAGE],
-                                                   find_name(data_multilingual_obj_names, first_obj_name)[BIERNIK]))
-                if (oname_curr == ABOVE):
-                    txt = txt.__add__(" od góry")
-                if (oname_curr == LEFT_ABOVE):
-                    txt.__add__(" w lewym górnym rogu")
-                if (oname_curr == RIGHT_ABOVE):
-                    txt = txt.__add__(" w prawym górnym rogu")
-                if (oname_curr == BELOW):
-                    txt.__add__(" od dołu")
-                if (oname_curr == LEFT_BELOW):
-                    txt = txt.__add__(" w lewym dolnym rogu")
-                if (oname_curr == RIGHT_BELOW):
-                    txt = txt.__add__(" w prawym dolnym rogu")
-                if (oname_curr == LEFT):
-                    txt = txt.__add__(" po lewej")
-                if (oname_curr == RIGHT):
-                    txt = txt.__add__(" po prawej")
-            txt = txt.__add__("\n")
+        if (tname_curr is TOUCHING):
+            # txt = txt.__add__("{} {} {} {}\n".format(find_name(data_multilingual_obj_names, first_obj_name)[LANGUAGE],
+            #                                        find_name(data_multilingual_positions, tname_curr)[LANGUAGE],
+            #                                        find_name(data_multilingual_obj_names, second_obj_name)[LANGUAGE],
+            #                                        find_name(data_multilingual_positions, oname_curr)[LANGUAGE]))
+            txt = txt.__add__(touching.format(find_name(data_multilingual_obj_names, second_obj_name)[PL],
+                                              find_name(data_multilingual_obj_names, first_obj_name)[NARZEDNIK]))
+            if (oname_curr == ABOVE):
+                txt = txt.__add__(" od góry")
+            if (oname_curr == LEFT_ABOVE):
+                txt = txt.__add__(" w lewym górnym rogu")
+            if (oname_curr == RIGHT_ABOVE):
+                txt = txt.__add__(" w prawym górnym rogu")
+            if (oname_curr == BELOW):
+                txt = txt.__add__(" od dołu")
+            if (oname_curr == LEFT_BELOW):
+                txt = txt.__add__(" w lewym dolnym rogu")
+            if (oname_curr == RIGHT_BELOW):
+                txt = txt.__add__(" w prawym dolnym rogu")
+            if (oname_curr == LEFT):
+                txt = txt.__add__(" po lewej")
+            if (oname_curr == RIGHT):
+                txt = txt.__add__(" po prawej")
+        if (tname_curr is CROSSING):
+            txt = txt.__add__(crossing.format(find_name(data_multilingual_obj_names, second_obj_name)[PL],
+                                              find_name(data_multilingual_obj_names, first_obj_name)[BIERNIK]))
+            if (oname_curr == ABOVE):
+                txt = txt.__add__(" od góry")
+            if (oname_curr == LEFT_ABOVE):
+                txt.__add__(" w lewym górnym rogu")
+            if (oname_curr == RIGHT_ABOVE):
+                txt = txt.__add__(" w prawym górnym rogu")
+            if (oname_curr == BELOW):
+                txt.__add__(" od dołu")
+            if (oname_curr == LEFT_BELOW):
+                txt = txt.__add__(" w lewym dolnym rogu")
+            if (oname_curr == RIGHT_BELOW):
+                txt = txt.__add__(" w prawym dolnym rogu")
+            if (oname_curr == LEFT):
+                txt = txt.__add__(" po lewej")
+            if (oname_curr == RIGHT):
+                txt = txt.__add__(" po prawej")
+        if (tname_curr is CLOSE):
+            txt = txt.__add__(close_to.format(find_name(data_multilingual_obj_names, second_obj_name)[PL],
+                                              find_name(data_multilingual_obj_names, first_obj_name)[BIERNIK]))
+            if (oname_curr == ABOVE):
+                txt = txt.__add__(" od góry")
+            if (oname_curr == LEFT_ABOVE):
+                txt.__add__(" w lewym górnym rogu")
+            if (oname_curr == RIGHT_ABOVE):
+                txt = txt.__add__(" w prawym górnym rogu")
+            if (oname_curr == BELOW):
+                txt.__add__(" od dołu")
+            if (oname_curr == LEFT_BELOW):
+                txt = txt.__add__(" w lewym dolnym rogu")
+            if (oname_curr == RIGHT_BELOW):
+                txt = txt.__add__(" w prawym dolnym rogu")
+            if (oname_curr == LEFT):
+                txt = txt.__add__(" po lewej")
+            if (oname_curr == RIGHT):
+                txt = txt.__add__(" po prawej")
+        txt = txt.__add__("\n")
     return txt
 
 
-def verbalize_pred_eng(pred, scene, fuzzy):
+def find_name(data, name):
+    return data[data[:, 0] == name, :][0]
+
+
+def verbalize_pred_eng(pred, scene, fuzzy, v_labels_sequential):
+    touching = "{} is touching {}"
+    crossing = "{} is crossing {}"
+    close_to = "{} is close to {}"
+    gen_desc = "On the picture we see "
+
     zerolab = 1
-    txt = ""
+    txt = gen_desc
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "yolov3_PL.csv")
+    data_multilingual_obj_names = pd.read_csv(data_path, delimiter=', ', engine='python').values
+
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "yolov3_PL_LM.csv")
+    data_multilingual_obj_names_lm = pd.read_csv(data_path, delimiter=', ', engine='python').values
+
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "texts_odmiana.csv")
+    data_multilingual_positions = pd.read_csv(data_path, delimiter=', ', engine='python').values
+
+    image = Counter(v_labels_sequential)
+    for object_name in image.keys():
+        if image[object_name] > 1:
+            txt = txt.__add__("{}, ".format(find_name(data_multilingual_obj_names_lm, object_name)[0]+"s"))
+        else:
+            txt = txt.__add__("{}, ".format(find_name(data_multilingual_obj_names, object_name)[0]))
+
+    txt = txt.__add__("\n")
 
     for i in range(len(pred)):
         curr_pred = pred[i, :]
@@ -286,12 +321,64 @@ def verbalize_pred_eng(pred, scene, fuzzy):
         oname_curr = fuzzy.lev3.oname[o]
         first_obj_name = scene.onames[scene.obj[int(curr_pred[0]), 1]]
         second_obj_name = scene.onames[scene.obj[int(curr_pred[2]), 1]]
-        txt = txt.__add__(" object {} {} : {} {} rel. to {} {} ({})\n".format(pred[i, 0] - zerolab,
-                                                                              first_obj_name,
-                                                                              tname_curr, oname_curr,
-                                                                              pred[i, 2] - zerolab,
-                                                                              second_obj_name,
-                                                                              curr_pred[9]))
+        if (tname_curr is TOUCHING):
+            txt = txt.__add__(touching.format(find_name(data_multilingual_obj_names, second_obj_name)[EN],
+                                              find_name(data_multilingual_obj_names, first_obj_name)[EN]))
+            if (oname_curr == ABOVE):
+                txt = txt.__add__(" from above")
+            if (oname_curr == LEFT_ABOVE):
+                txt = txt.__add__(" on the left upper corner")
+            if (oname_curr == RIGHT_ABOVE):
+                txt = txt.__add__(" on the right upper corner")
+            if (oname_curr == BELOW):
+                txt = txt.__add__(" below")
+            if (oname_curr == LEFT_BELOW):
+                txt = txt.__add__(" on the left below corneru")
+            if (oname_curr == RIGHT_BELOW):
+                txt = txt.__add__(" on the right below corner")
+            if (oname_curr == LEFT):
+                txt = txt.__add__(" on the left")
+            if (oname_curr == RIGHT):
+                txt = txt.__add__(" on the right")
+        if (tname_curr is CROSSING):
+            txt = txt.__add__(crossing.format(find_name(data_multilingual_obj_names, second_obj_name)[EN],
+                                              find_name(data_multilingual_obj_names, first_obj_name)[EN]))
+            if (oname_curr == ABOVE):
+                txt = txt.__add__(" from above")
+            if (oname_curr == LEFT_ABOVE):
+                txt = txt.__add__(" on the left upper corner")
+            if (oname_curr == RIGHT_ABOVE):
+                txt = txt.__add__(" on the right upper corner")
+            if (oname_curr == BELOW):
+                txt = txt.__add__(" below")
+            if (oname_curr == LEFT_BELOW):
+                txt = txt.__add__(" on the left below corner")
+            if (oname_curr == RIGHT_BELOW):
+                txt = txt.__add__(" on the right below corner")
+            if (oname_curr == LEFT):
+                txt = txt.__add__(" on the left")
+            if (oname_curr == RIGHT):
+                txt = txt.__add__(" on the right")
+        if (tname_curr is CLOSE):
+            txt = txt.__add__(crossing.format(find_name(data_multilingual_obj_names, second_obj_name)[EN],
+                                              find_name(data_multilingual_obj_names, first_obj_name)[EN]))
+            if (oname_curr == ABOVE):
+                txt = txt.__add__(" from above")
+            if (oname_curr == LEFT_ABOVE):
+                txt = txt.__add__(" on the left upper corner")
+            if (oname_curr == RIGHT_ABOVE):
+                txt = txt.__add__(" on the right upper corner")
+            if (oname_curr == BELOW):
+                txt = txt.__add__(" below")
+            if (oname_curr == LEFT_BELOW):
+                txt = txt.__add__(" on the left below corner")
+            if (oname_curr == RIGHT_BELOW):
+                txt = txt.__add__(" on the right below corner")
+            if (oname_curr == LEFT):
+                txt = txt.__add__(" on the left")
+            if (oname_curr == RIGHT):
+                txt = txt.__add__(" on the right")
+        txt = txt.__add__("\n")
     return txt
 
 
