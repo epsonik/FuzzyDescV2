@@ -19,23 +19,14 @@ near above, obok wyżej
 near left, obok z lewej
 far above, daleko powyżej
 far left, daleko po lewej
-inside, wewnątrz
-crossing, przecina
-touching, dotyka
-close, blisko
-near, obok
-far, daleko
-larger, większy
-split, dzieli
-same, taki sam
-above, powyżej górnej krawędzi
-left-above, lewo wyżej
-left, po lewej
+left-above, on the left upper corner
+left, on the left
 horizontal, poziomo
 vertical, pionowo
 centered, na środku
-left-below, niżej z lewej
-below, niżej
-right-below, niżej z prawej
-right, po prawej
-right-above, z prawej powyżej
+left-below, on the left below corner
+below, below
+right-below, on the right below corner
+right, on the right
+right-above,  on the right upper corner
+above, from above

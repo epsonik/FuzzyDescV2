@@ -1,21 +1,21 @@
 ENG, PL, D, B, N
 person, człowiek, człowieka, człowieka, człowiekiem
 bicycle, rower, rowera, rower, rowerem
-car, ,samochód, samochodu, samochód, samochodem
-motorcycle, ,motocykl, motocykla, motocykl, motocyklem
-airplane, ,samolot, samolotu, samolot, samolotem
-bus, ,autobus, autobusu,autobus, autobusem
-train, ,pociąg, pociągu, pociąg, pociągiem
-truck, półciężarówka, półciężarówki, półciężarówkę, ,półciężarówką
-boat, ,łódź, łodzi, łódź, łodzią
+car, samochód, samochodu, samochód, samochodem
+motorcycle, motocykl, motocykla, motocykl, motocyklem
+airplane, samolot, samolotu, samolot, samolotem
+bus, autobus, autobusu,autobus, autobusem
+train, pociąg, pociągu, pociąg, pociągiem
+truck, półciężarówka, półciężarówki, półciężarówkę, półciężarówką
+boat, łódź, łodzi, łódź, łodzią
 traffic light, sygnalizator świetlny, sygnalizatora świetlnego, sygnalizator świetlny, sygnalizatorem świetlnym
-fire hydrant, ,hydrant, hydranta, hydrant, hydrantem
+fire hydrant, hydrant, hydranta, hydrant, hydrantem
 stop sign, znak stop, znaku stopu, znak stopu, znakiem stopu
 parking meter, parkometr, parkometru, parkometr, parkometrem
-bench, ,ławka, ławki, ławkę, ławką
-bird, ,ptak, ptaka, ptaka, ptakiem
+bench, ławka, ławki, ławkę, ławką
+bird, ptak, ptaka, ptaka, ptakiem
 cat, kot, kota, kota, kotem
-dog, ,pies, psa, psa, psem
+dog, pies, psa, psa, psem
 horse, koń, konia, konia, koniem
 sheep, owca, owcy, owcę, owcą
 cow, krowa, krowy, krowę, krową
@@ -50,7 +50,7 @@ apple, jabłko, jabłka, jabłko, jabłkiem
 sandwich, kanapka, kanapki, kanapkę, kanapką
 orange, pomarańcza, pomarańczy, pomarańczę, pomarańczą
 broccoli, brokół, brokóła, brokół, brokółem
-carrot, ,marchew, marchwki, marchew, marchwią
+carrot, marchew, marchwki, marchew, marchwią
 hot dog, hot dog, hot doga, hot doga, hot dogiem
 pizza, pizza, pizzy, pizzę, pizzą
 donut, pączek, pączka, pączek, pączkiem

@@ -198,7 +198,7 @@ def load_etykiety():
 
     lev3 = Lev3(maxt=10,
                 type=['FA', 'NE', 'CL', 'TO', 'CR', 'IN', 'LG', 'SP', 'SA'],
-                tsal=[0.6, 0.7, 0.8, 0.9, 0.9, 0.8, 0.3, 0.9, 1],
+                tsal=[0.6, 0.7, 0.8, 0.8, 0.9, 0.8, 0.3, 0.9, 1],
                 tname=[FAR, NEAR, CLOSE, TOUCHING, CROSSING, INSIDE, LARGER, SPLIT, SAME],
                 orientation=None, osal=None, oname=None)
 
