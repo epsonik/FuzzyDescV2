@@ -1,44 +1,44 @@
-LONGER = "longer"
+LONGER = 'longer'
 
-FAR_BELOW = "far below"
+FAR_BELOW = 'far below'
 
-FAR_RIGHT = "far right"
+FAR_RIGHT = 'far right'
 
-NEAR_RIGHT = "near right"
+NEAR_RIGHT = 'near right'
 
-NEAR_BELOW = "near below"
+NEAR_BELOW = 'near below'
 
-CLOSE_RIGHT = "close right"
+CLOSE_RIGHT = 'close right'
 
-CLOSE_BELOW = "close below"
+CLOSE_BELOW = 'close below'
 
-EDGE_BELOW = "edge below"
+EDGE_BELOW = 'edge below'
 
-EDGE_RIGHT = "edge right"
+EDGE_RIGHT = 'edge right'
 
-INSIDE_BELOW = "inside below"
+INSIDE_BELOW = 'inside below'
 
-INSIDE_RIGHT = "inside right"
+INSIDE_RIGHT = 'inside right'
 
-INSIDE_ABOVE = "inside above"
+INSIDE_ABOVE = 'inside above'
 
-INSIDE_LEFT = "inside left"
+INSIDE_LEFT = 'inside left'
 
-EDGE_ABOVE = "edge above"
+EDGE_ABOVE = 'edge above'
 
-EDGE_LEFT = "edge left"
+EDGE_LEFT = 'edge left'
 
-CLOSE_LEFT = "close left"
+CLOSE_LEFT = 'close left'
 
-CLOSE_ABOVE = "close above"
+CLOSE_ABOVE = 'close above'
 
-NEAR_ABOVE = "near above"
+NEAR_ABOVE = 'near above'
 
-NEAR_LEFT = "near left"
+NEAR_LEFT = 'near left'
 
-FAR_ABOVE = "far above"
+FAR_ABOVE = 'far above'
 
-FAR_LEFT = "far left"
+FAR_LEFT = 'far left'
 
 INSIDE = 'inside'
 

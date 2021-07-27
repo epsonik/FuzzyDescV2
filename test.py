@@ -51,4 +51,4 @@ print(verbalize_pred_pl(pred_sort, gtruth, fuzzy, v_labels_sequential))
 # print(verbalize_pred_eng(pred_sort, gtruth, fuzzy, v_labels_sequential))
 # print(verbalize_pred(pred_sort, gtruth, fuzzy))
 
-draw_boxes(input_filename, photo_boxed_filename, gtruth.obj, v_labels_sequential)
+# draw_boxes(input_filename, photo_boxed_filename, gtruth.obj, v_labels_sequential)
