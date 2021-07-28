@@ -9,6 +9,7 @@ from YOLO.img_det import vbox_engine, draw_boxes
 import numpy as np
 
 from helper import generate_description, verbalize_pred_pl, verbalize_pred, verbalize_pred_eng
+from t import test_data
 
 
 def from_pic(input_filename):
@@ -46,6 +47,7 @@ def from_pic(input_filename):
 input_filename = "images/6813627120_a222bcba0d_z.jpg"
 photo_boxed_filename = input_filename.replace('.jpg', '_boxed.jpg')
 gtruth, v_labels_sequential = from_pic(input_filename)
+# gtruth, v_labels_sequential = test_data()
 pred_sort, gtruth, fuzzy = generate_description(gtruth)
 print(verbalize_pred_pl(pred_sort, gtruth, fuzzy, v_labels_sequential))
 # print(verbalize_pred_eng(pred_sort, gtruth, fuzzy, v_labels_sequential))

@@ -196,26 +196,29 @@ def verbalize_pred_pl(pred, scene, fuzzy, v_labels_sequential):
     # location = pd.read_csv(data_path, delimiter=', ', engine='python').values
 
     data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/location.csv")
-    frameworks = pd.read_csv(data_path, delimiter=', ', engine='python', header=None).values
-    frameworks = dict(zip(frameworks[:, 0], frameworks[:, 1:]))
+    frameworks_location = pd.read_csv(data_path, delimiter=', ', engine='python', header=None).values
+    frameworks_location = dict(zip(frameworks_location[:, 0], frameworks_location[:, 1:]))
 
     data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/orientation.csv")
-    orientation = pd.read_csv(data_path, delimiter=', ', engine='python').values
+    frameworks_orientation = pd.read_csv(data_path, delimiter=', ', engine='python', header=None).values
+    frameworks_orientation = dict(zip(frameworks_orientation[:, 0], frameworks_orientation[:, 1:]))
 
     data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/yolov3_LM.csv")
-    data_multilingual_obj_names_lm = pd.read_csv(data_path, delimiter=', ', engine='python').values
+    data_multilingual_obj_names_lm = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
 
     data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/yolov3.csv")
     data_multilingual_obj_names = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
 
-    # image = Counter(v_labels_sequential)
-    # for object_name in image.keys():
-    #     if image[object_name] > 1:
-    #         txt = txt.__add__("{}, ".format(find_name(data_multilingual_obj_names_lm.values, object_name)[3]))
-    #     else:
-    #         txt = txt.__add__("{}, ".format(find_name(data_multilingual_obj_names.values, object_name)[3]))
-    #
-    # txt = txt.__add__("\n")
+    image_labels_counter = Counter(v_labels_sequential)
+    for object_name in image_labels_counter.keys():
+        if image_labels_counter[object_name] > 1:
+            txt = txt.__add__(
+                " {B}, ".format_map(get_row(data_multilingual_obj_names_lm, object_name)))
+        else:
+            txt = txt.__add__(
+                " {B}, ".format_map(get_row(data_multilingual_obj_names, object_name)))
+
+    txt = txt.__add__("\n")
 
     for i in range(len(pred)):
         curr_pred = pred[i, :]
@@ -227,70 +230,13 @@ def verbalize_pred_pl(pred, scene, fuzzy, v_labels_sequential):
         first_obj_name = scene.onames[scene.obj[int(curr_pred[0]), 1]]
         second_obj_name = scene.onames[scene.obj[int(curr_pred[2]), 1]]
 
-        framework = frameworks[location_name_curr][0]
+        framework_location = frameworks_location[location_name_curr][0]
+        framework_orientation = frameworks_orientation[orientation_name_curr][0]
         txt = txt.__add__(
-            framework.format_map(get_row(data_multilingual_obj_names, first_obj_name)))
-
-        # if (location_name_curr is CROSSING):
-        #     txt = txt.__add__(
-        #         crossing.format(pred[i, 2] - zerolab, find_name(data_multilingual_obj_names, second_obj_name)[PL],
-        #                         pred[i, 0] - zerolab, find_name(data_multilingual_obj_names, first_obj_name)[BIERNIK]))
-        #     if (orientation_name_curr == ABOVE):
-        #         txt = txt.__add__(" od góry")
-        #     if (orientation_name_curr == LEFT_ABOVE):
-        #         txt.__add__(" w lewym górnym rogu")
-        #     if (orientation_name_curr == RIGHT_ABOVE):
-        #         txt = txt.__add__(" w prawym górnym rogu")
-        #     if (orientation_name_curr == BELOW):
-        #         txt.__add__(" od dołu")
-        #     if (orientation_name_curr == LEFT_BELOW):
-        #         txt = txt.__add__(" w lewym dolnym rogu")
-        #     if (orientation_name_curr == RIGHT_BELOW):
-        #         txt = txt.__add__(" w prawym dolnym rogu")
-        #     if (orientation_name_curr == LEFT):
-        #         txt = txt.__add__(" po lewej")
-        #     if (orientation_name_curr == RIGHT):
-        #         txt = txt.__add__(" po prawej")
-        # if (location_name_curr is CLOSE):
-        #     txt = txt.__add__(
-        #         close_to.format(pred[i, 2] - zerolab, find_name(data_multilingual_obj_names, second_obj_name)[PL],
-        #                         pred[i, 0] - zerolab, find_name(data_multilingual_obj_names, first_obj_name)[BIERNIK]))
-        #     if (orientation_name_curr == ABOVE):
-        #         txt = txt.__add__(" od góry")
-        #     if (orientation_name_curr == LEFT_ABOVE):
-        #         txt.__add__(" w lewym górnym rogu")
-        #     if (orientation_name_curr == RIGHT_ABOVE):
-        #         txt = txt.__add__(" w prawym górnym rogu")
-        #     if (orientation_name_curr == BELOW):
-        #         txt.__add__(" od dołu")
-        #     if (orientation_name_curr == LEFT_BELOW):
-        #         txt = txt.__add__(" w lewym dolnym rogu")
-        #     if (orientation_name_curr == RIGHT_BELOW):
-        #         txt = txt.__add__(" w prawym dolnym rogu")
-        #     if (orientation_name_curr == LEFT):
-        #         txt = txt.__add__(" po lewej")
-        #     if (orientation_name_curr == RIGHT):
-        #         txt = txt.__add__(" po prawej")
-        # if (location_name_curr is INSIDE):
-        #     txt = txt.__add__(
-        #         close_to.format(pred[i, 2] - zerolab, find_name(data_multilingual_obj_names, second_obj_name)[PL],
-        #                         pred[i, 0] - zerolab, find_name(data_multilingual_obj_names, first_obj_name)[BIERNIK]))
-        #     if (orientation_name_curr == ABOVE):
-        #         txt = txt.__add__(" od góry")
-        #     if (orientation_name_curr == LEFT_ABOVE):
-        #         txt.__add__(" w lewym górnym rogu")
-        #     if (orientation_name_curr == RIGHT_ABOVE):
-        #         txt = txt.__add__(" w prawym górnym rogu")
-        #     if (orientation_name_curr == BELOW):
-        #         txt.__add__(" od dołu")
-        #     if (orientation_name_curr == LEFT_BELOW):
-        #         txt = txt.__add__(" w lewym dolnym rogu")
-        #     if (orientation_name_curr == RIGHT_BELOW):
-        #         txt = txt.__add__(" w prawym dolnym rogu")
-        #     if (orientation_name_curr == LEFT):
-        #         txt = txt.__add__(" po lewej")
-        #     if (orientation_name_curr == RIGHT):
-        #         txt = txt.__add__(" po prawej")
+            framework_location.format_map(get_row(data_multilingual_obj_names, first_obj_name)))
+        txt = txt.__add__(", ")
+        txt = txt.__add__(
+            framework_orientation.format_map(get_row(data_multilingual_obj_names, first_obj_name)))
         txt = txt.__add__("\n")
     return txt
 
@@ -301,7 +247,7 @@ def find_name(data, name):
 
 def get_row(data, name):
     return data.iloc[
-                    data.index[data['ENG'] == name]].to_dict('records')[0]
+        data.index[data['ENG'] == name]].to_dict('records')[0]
 
 
 def verbalize_pred_eng(pred, scene, fuzzy, v_labels_sequential):
