@@ -1,6 +1,7 @@
 # load yolov3 model and perform object detection
 # based on https://github.com/experiencor/keras-yolo3
 import os
+from collections import Counter
 
 import numpy as np
 from keras.models import load_model
@@ -140,7 +141,15 @@ def get_boxes(boxes, thresh):
     return v_boxes, v_labels, v_scores
 
 
+class Box:
+    def __init__(self, box, label, seq_id):
+        self.box = box
+        self.label = label
+        self.seq_id = seq_id
+
+
 def return_coordinates(v_boxes, v_labels, image_w, image_h):
+    boxes = dict()
     v_boxes_matlab = []
     obj_number = 1
     b = [0, 0, 10, 10, image_w, image_h]
@@ -154,13 +163,16 @@ def return_coordinates(v_boxes, v_labels, image_w, image_h):
         def check_labels(lab):
             if lab not in v_labels_matlab:
                 v_labels_matlab.append(lab)
+                boxes[lab] = [Box(box, v_labels[idx], 0)]
+            else:
+                boxes[lab].append(Box(box, v_labels[idx], len(boxes[lab])))
             return v_labels_matlab.index(lab)
 
         b = [obj_number, check_labels(v_labels[idx]), x1, y1, width, height]
         v_boxes_matlab.append(b)
         v_labels_matlab_sequential.append(labels[idx])
         obj_number += 1
-    return v_boxes_matlab, v_labels_matlab, v_labels_matlab_sequential
+    return v_boxes_matlab, v_labels_matlab, v_labels_matlab_sequential, boxes
 
 
 # draw all results
