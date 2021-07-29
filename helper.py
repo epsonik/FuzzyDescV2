@@ -20,19 +20,6 @@ EN = 0
 BIERNIK = 3
 NARZEDNIK = 4
 
-data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/location.csv")
-frameworks_location = pd.read_csv(data_path, delimiter=', ', engine='python', header=None).values
-frameworks_location = dict(zip(frameworks_location[:, 0], frameworks_location[:, 1:]))
-
-data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/orientation.csv")
-frameworks_orientation = pd.read_csv(data_path, delimiter=', ', engine='python', header=None).values
-frameworks_orientation = dict(zip(frameworks_orientation[:, 0], frameworks_orientation[:, 1:]))
-
-data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/yolov3_LM.csv")
-data_multilingual_obj_names_lm = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
-
-data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/yolov3.csv")
-data_multilingual_obj_names = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
 
 def fmpm(scene, fuzzy):
     # liczba obiektow
@@ -203,15 +190,50 @@ def verbalize_pred(pred, scene, fuzzy):
     return txt
 
 
+def load_lang_data_pl():
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/location.csv")
+    frameworks_location = pd.read_csv(data_path, delimiter=', ', engine='python', header=None).values
+    frameworks_location = dict(zip(frameworks_location[:, 0], frameworks_location[:, 1:]))
+
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/orientation.csv")
+    frameworks_orientation = pd.read_csv(data_path, delimiter=', ', engine='python', header=None).values
+    frameworks_orientation = dict(zip(frameworks_orientation[:, 0], frameworks_orientation[:, 1:]))
+
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/yolov3_LM.csv")
+    data_multilingual_obj_names_lm = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
+
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/yolov3.csv")
+    data_multilingual_obj_names = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
+    return frameworks_location, frameworks_orientation, data_multilingual_obj_names, data_multilingual_obj_names_lm
+
+
+def load_lang_data_eng():
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "eng/location.csv")
+    frameworks_location = pd.read_csv(data_path, delimiter=', ', engine='python', header=None).values
+    frameworks_location = dict(zip(frameworks_location[:, 0], frameworks_location[:, 1:]))
+
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "eng/orientation.csv")
+    frameworks_orientation = pd.read_csv(data_path, delimiter=', ', engine='python', header=None).values
+    frameworks_orientation = dict(zip(frameworks_orientation[:, 0], frameworks_orientation[:, 1:]))
+
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "eng/yolov3_LM.csv")
+    data_multilingual_obj_names_lm = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
+
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "eng/yolov3.csv")
+    data_multilingual_obj_names = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
+    return frameworks_location, frameworks_orientation, data_multilingual_obj_names, data_multilingual_obj_names_lm
+
+
 def verbalize_pred_pl(pred, scene, fuzzy, v_labels_sequential):
     gen_desc = "Na obrazie widzimy "
     zerolab = 1
     txt = gen_desc
     # data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/location_pl.csv")
     # location = pd.read_csv(data_path, delimiter=', ', engine='python').values
-
-
-
+    frameworks_location, \
+    frameworks_orientation, \
+    data_multilingual_obj_names, \
+    data_multilingual_obj_names_lm = load_lang_data_pl()
     image_labels_counter = Counter(v_labels_sequential)
     for object_name in image_labels_counter.keys():
         if image_labels_counter[object_name] > 1:
@@ -270,11 +292,10 @@ def create_replacement(framework, data_multilingual_obj_names, predicate_ref_obj
 def verbalize_pred_eng(pred, scene, fuzzy, v_labels_sequential):
     zerolab = 1
     txt = gen_desc
-    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/yolov3.csv")
-    data_multilingual_obj_names = pd.read_csv(data_path, delimiter=', ', engine='python').values
-
-    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/yolov3_LM.csv")
-    data_multilingual_obj_names_lm = pd.read_csv(data_path, delimiter=', ', engine='python').values
+    frameworks_location, \
+    frameworks_orientation, \
+    data_multilingual_obj_names, \
+    data_multilingual_obj_names_lm = load_lang_data_eng()
 
     image = Counter(v_labels_sequential)
     for object_name in image.keys():
