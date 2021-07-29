@@ -125,37 +125,42 @@ def load_image_pixels(filename, shape):
 
 
 # get all of the results above a threshold
-def get_boxes(boxes, labels, thresh, image_w, image_h, photo_filename, photo_boxed_filename):
-    v_boxes2, v_boxes, v_scores = list(), [], list()
+def get_boxes(boxes, thresh):
+    v_boxes, v_labels, v_scores = list(), list(), list()
     # enumerate all boxes
-    obj_number = 1
-    b = [0, 0, 10, 10, image_w, image_h]
-    v_labels = ['scene']
-    v_labels_sequential = ['scene']
-    v_boxes.append(b)
     for box in boxes:
         # enumerate all possible labels
         for i in range(len(labels)):
             # check if the threshold for this label is high enough
             if box.classes[i] > thresh:
-                y1, x1, y2, x2 = box.YtopLeft, box.XtopLeft, box.YbottomRight, box.XbottomRight
-                # calculate width and height of the box
-                width, height = box.calculate_width(), box.calculate_height()
-
-                def check_labels(lab):
-                    if lab not in v_labels:
-                        v_labels.append(lab)
-                    return v_labels.index(lab)
-
-                b = [obj_number, check_labels(labels[i]), x1, y1, width, height]
-                v_boxes.append(b)
-                v_boxes2.append(box)
-                v_labels_sequential.append(labels[i])
+                v_boxes.append(box)
+                v_labels.append(labels[i])
                 v_scores.append(box.classes[i] * 100)
-                obj_number += 1
             # don't break, many labels may trigger for one box
+    return v_boxes, v_labels, v_scores
 
-    return v_boxes, v_labels, v_scores, v_labels_sequential
+
+def return_coordinates(v_boxes, v_labels, image_w, image_h):
+    v_boxes_matlab = []
+    obj_number = 1
+    b = [0, 0, 10, 10, image_w, image_h]
+    v_labels_matlab = ['scene']
+    v_labels_matlab_sequential = ['scene']
+    v_boxes_matlab.append(b)
+    for idx, box in enumerate(v_boxes):
+        y1, x1, y2, x2 = box.YtopLeft, box.XtopLeft, box.YbottomRight, box.XbottomRight
+        width, height = box.calculate_width(), box.calculate_height()
+
+        def check_labels(lab):
+            if lab not in v_labels_matlab:
+                v_labels_matlab.append(lab)
+            return v_labels_matlab.index(lab)
+
+        b = [obj_number, check_labels(v_labels[idx]), x1, y1, width, height]
+        v_boxes_matlab.append(b)
+        v_labels_matlab_sequential.append(labels[idx])
+        obj_number += 1
+    return v_boxes_matlab, v_labels_matlab, v_labels_matlab_sequential
 
 
 # draw all results
@@ -215,8 +220,6 @@ def vbox_engine(photo_filename, photo_boxed_filename):
     do_nms(boxes, 0.5)
     # define the labels
     # get the details of the detected objects
-    v_boxes, v_labels, v_scores, v_labels_sequential = get_boxes(boxes, labels, class_threshold, image_w, image_h,
-                                                                 photo_filename,
-                                                                 photo_boxed_filename)
-    return v_boxes, v_labels, v_scores, image_w, image_h, v_labels_sequential
+    v_boxes, v_labels, v_scores = get_boxes(boxes, class_threshold)
+    return v_boxes, v_labels, v_scores, image_w, image_h
 # summarize what we found

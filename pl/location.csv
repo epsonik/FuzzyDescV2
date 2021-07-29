@@ -1,9 +1,9 @@
-touching, {M} styka się z {N}
-crossing, {M} nachodzi na {B}
-close, {M} jest blisko {D}
-inside, wewnątrz {D} znajduje się {M}
-near, obok {D} znjajduje się {M}
-far, daleko od {D} jest {M}
-larger, {M} jest większy od {D}
-split, {M} rozdziela {B}
-same, {M} jest tej samej wielkości co {M}
+touching, {M:0} styka się z {N:1}
+crossing, {M:0} nachodzi na {B:1}
+close, {M:0} jest blisko {D:1}
+inside, wewnątrz {D:0} znajduje się {M:0}
+near, obok {D:0} znajjduje się {M:1}
+far, daleko od {D:0} jest {M:0}
+larger, {M:0} jest większy od {D:1}
+split, {M:0} rozdziela {B:1}
+same, {M:0} jest tej samej wielkości co {M:1}

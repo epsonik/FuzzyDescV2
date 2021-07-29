@@ -1,4 +1,6 @@
+import copy
 import os
+import re
 from collections import Counter
 
 import pandas as pd
@@ -18,6 +20,19 @@ EN = 0
 BIERNIK = 3
 NARZEDNIK = 4
 
+data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/location.csv")
+frameworks_location = pd.read_csv(data_path, delimiter=', ', engine='python', header=None).values
+frameworks_location = dict(zip(frameworks_location[:, 0], frameworks_location[:, 1:]))
+
+data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/orientation.csv")
+frameworks_orientation = pd.read_csv(data_path, delimiter=', ', engine='python', header=None).values
+frameworks_orientation = dict(zip(frameworks_orientation[:, 0], frameworks_orientation[:, 1:]))
+
+data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/yolov3_LM.csv")
+data_multilingual_obj_names_lm = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
+
+data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/yolov3.csv")
+data_multilingual_obj_names = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
 
 def fmpm(scene, fuzzy):
     # liczba obiektow
@@ -195,19 +210,7 @@ def verbalize_pred_pl(pred, scene, fuzzy, v_labels_sequential):
     # data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/location_pl.csv")
     # location = pd.read_csv(data_path, delimiter=', ', engine='python').values
 
-    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/location.csv")
-    frameworks_location = pd.read_csv(data_path, delimiter=', ', engine='python', header=None).values
-    frameworks_location = dict(zip(frameworks_location[:, 0], frameworks_location[:, 1:]))
 
-    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/orientation.csv")
-    frameworks_orientation = pd.read_csv(data_path, delimiter=', ', engine='python', header=None).values
-    frameworks_orientation = dict(zip(frameworks_orientation[:, 0], frameworks_orientation[:, 1:]))
-
-    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/yolov3_LM.csv")
-    data_multilingual_obj_names_lm = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
-
-    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/yolov3.csv")
-    data_multilingual_obj_names = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
 
     image_labels_counter = Counter(v_labels_sequential)
     for object_name in image_labels_counter.keys():
@@ -232,11 +235,11 @@ def verbalize_pred_pl(pred, scene, fuzzy, v_labels_sequential):
 
         framework_location = frameworks_location[location_name_curr][0]
         framework_orientation = frameworks_orientation[orientation_name_curr][0]
-        txt = txt.__add__(
-            framework_location.format_map(get_row(data_multilingual_obj_names, first_obj_name)))
+        sentence = create_replacement(framework_location, data_multilingual_obj_names,
+                                      [first_obj_name, second_obj_name])
+        txt = txt.__add__(sentence)
         txt = txt.__add__(", ")
-        txt = txt.__add__(
-            framework_orientation.format_map(get_row(data_multilingual_obj_names, first_obj_name)))
+        txt = txt.__add__("{}".format(framework_orientation))
         txt = txt.__add__("\n")
     return txt
 
@@ -248,6 +251,20 @@ def find_name(data, name):
 def get_row(data, name):
     return data.iloc[
         data.index[data['ENG'] == name]].to_dict('records')[0]
+
+
+def create_replacement(framework, data_multilingual_obj_names, predicate_ref_obj):
+    regex = r'\{(.*?)\}'
+    obj_places = re.findall(regex, framework)
+    sentence = copy.copy(framework)
+    for a_string in obj_places:
+        result = a_string.split(":")
+        object_case_name = result[0]
+        object_place = int(result[1])
+        object_case = get_row(data_multilingual_obj_names, predicate_ref_obj[object_place])
+        s = "{" + a_string + "}"
+        sentence = sentence.replace(s, object_case[object_case_name])
+    return sentence
 
 
 def verbalize_pred_eng(pred, scene, fuzzy, v_labels_sequential):
