@@ -235,14 +235,20 @@ def verbalize_pred_pl(pred, scene, fuzzy, v_labels_sequential):
     data_multilingual_obj_names, \
     data_multilingual_obj_names_lm = load_lang_data_pl()
     image_labels_counter = Counter(v_labels_sequential)
-    for object_name in image_labels_counter.keys():
-        if image_labels_counter[object_name] > 1:
-            txt = txt.__add__(
-                " {B}, ".format_map(get_row(data_multilingual_obj_names_lm, object_name)))
-        else:
-            txt = txt.__add__(
-                " {B}, ".format_map(get_row(data_multilingual_obj_names, object_name)))
 
+    def generate_preambule():
+        preambule = ''
+        for object_name in image_labels_counter.keys():
+            if image_labels_counter[object_name] > 1:
+                preambule = preambule.__add__(
+                    " {B}, ".format_map(get_row(data_multilingual_obj_names_lm, object_name)))
+            else:
+                preambule = preambule.__add__(
+                    " {B}, ".format_map(get_row(data_multilingual_obj_names, object_name)))
+        return preambule
+
+    preambule = generate_preambule()
+    txt = txt.__add__(preambule)
     txt = txt.__add__("\n")
 
     for i in range(len(pred)):
