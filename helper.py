@@ -2,6 +2,7 @@ import copy
 import os
 import re
 from collections import Counter
+from operator import attrgetter
 
 import pandas as pd
 
@@ -144,13 +145,13 @@ def get_predicates(fmpm_mat, scene, fuzzy):
     return np.array(plist)
 
 
-def sort_predicates(pred, scene, fuzzy, order, gtruth):
+def sort_predicates(pred, fuzzy, order, gtruth, boxes):
     # liczba obiektów na obrazie
 
     to_sort1 = np.insert(pred, pred.shape[1], pred[:, 5], axis=1)
     to_sort = pd.DataFrame(to_sort1).sort_values(by=order, ascending=False)
     to_sort = to_sort.to_numpy()
-    # print(verbalize_pred(np.array(to_sort), gtruth, fuzzy))
+    print(verbalize_pred(np.array(to_sort), gtruth, fuzzy, boxes))
     return to_sort
 
 
@@ -168,7 +169,7 @@ def filter_predicates(to_sort, scene):
     return np.array(pred_out)
 
 
-def verbalize_pred(pred, scene, fuzzy):
+def verbalize_pred(pred, scene, fuzzy, boxes):
     zerolab = 1
     txt = ""
 
@@ -181,12 +182,16 @@ def verbalize_pred(pred, scene, fuzzy):
         oname_curr = fuzzy.lev3.oname[o]
         first_obj_name = scene.onames[scene.obj[int(curr_pred[0]), 1]]
         second_obj_name = scene.onames[scene.obj[int(curr_pred[2]), 1]]
-        txt = txt.__add__("{} object {} {} : {} {} rel. to {} {} ({})\n".format(i, pred[i, 0] - zerolab,
-                                                                                first_obj_name,
-                                                                                tname_curr, oname_curr,
-                                                                                pred[i, 2] - zerolab,
-                                                                                second_obj_name,
-                                                                                curr_pred[8]))
+        obj_id_from_predicate = pred[i, 0] - zerolab
+        sequence_id = get_seq_id(first_obj_name, obj_id_from_predicate, boxes)
+        txt = txt.__add__(
+            "{} {} object {} {} : {} {} rel. to {} {} ({})\n".format(sequence_id, i,
+                                                                     obj_id_from_predicate,
+                                                                     first_obj_name,
+                                                                     tname_curr, oname_curr,
+                                                                     pred[i, 2] - zerolab,
+                                                                     second_obj_name,
+                                                                     curr_pred[8]))
     return txt
 
 
@@ -224,7 +229,18 @@ def load_lang_data_eng():
     return frameworks_location, frameworks_orientation, data_multilingual_obj_names, data_multilingual_obj_names_lm
 
 
-def verbalize_pred_pl(pred, scene, fuzzy, v_labels_sequential):
+def get_seq_id(obj_name, id_from_predicate, boxes):
+    key_id = attrgetter("id")
+    key_seq_id = attrgetter("seq_id")
+    if obj_name is not "scene":
+        boxes_for_label = boxes[obj_name]
+        for box in boxes_for_label:
+            if key_id(box) == int(id_from_predicate):
+                return key_seq_id(box)
+    return None
+
+
+def verbalize_pred_pl(pred, scene, fuzzy, v_labels_sequential, boxes):
     gen_desc = "Na obrazie widzimy "
     zerolab = 1
     txt = gen_desc
@@ -385,11 +401,11 @@ def verbalize_pred_eng(pred, scene, fuzzy, v_labels_sequential):
     return txt
 
 
-def generate_description(gtruth):
+def generate_description(gtruth, boxes):
     fuzzy = load_etykiety()
     fmpm_mat = fmpm(gtruth, fuzzy)
 
     pred = get_predicates(fmpm_mat, gtruth, fuzzy)
-    to_sort = sort_predicates(pred, gtruth, fuzzy, [1, 5, 8, 3], gtruth)
+    to_sort = sort_predicates(pred, fuzzy, [1, 5, 8, 3], gtruth, boxes)
     pred_filtered = filter_predicates(to_sort, gtruth)
     return pred_filtered, gtruth, fuzzy

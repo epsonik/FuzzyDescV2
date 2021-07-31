@@ -8,7 +8,7 @@ from itertools import repeat
 from YOLO.img_det import vbox_engine, draw_boxes, return_coordinates
 import numpy as np
 
-from helper import generate_description, verbalize_pred_pl, verbalize_pred, verbalize_pred_eng
+from helper import generate_description, verbalize_pred_pl, verbalize_pred, verbalize_pred_eng, get_seq_id
 from t import test_data
 
 
@@ -18,7 +18,8 @@ def from_pic(input_filename):
     photo_boxed_filename = input_filename.replace('.jpg', '_boxed.jpg')
     v_boxes, v_labels, v_scores, image_w, image_h = vbox_engine(input_filename,
                                                                 photo_boxed_filename)
-    v_boxes_matlab_format, v_labels_matlab, v_labels_matlab_sequential, boxes = return_coordinates(v_boxes, v_labels, image_w, image_h)
+    v_boxes_matlab_format, v_labels_matlab, v_labels_matlab_sequential, boxes = return_coordinates(v_boxes, v_labels,
+                                                                                                   image_w, image_h)
 
     image = Image.open(input_filename)
 
@@ -36,7 +37,7 @@ def from_pic(input_filename):
     scene = Scene(im=im, fname=input_filename, size=size, onames=onames, ocols=[], obj=obj, obj_num=obj_num,
                   obj_org=obj_org,
                   background=background, background2=background2)
-    return scene, v_labels_matlab, v_labels_matlab_sequential
+    return scene, v_labels_matlab, v_labels_matlab_sequential, boxes
 
 
 # process_for_grouping()
@@ -47,10 +48,10 @@ def from_pic(input_filename):
 
 input_filename = "images/7775781830_e93c63f661_z.jpg"
 photo_boxed_filename = input_filename.replace('.jpg', '_boxed.jpg')
-gtruth, v_labels_matlab, v_labels_sequential = from_pic(input_filename)
+gtruth, v_labels_matlab, v_labels_sequential, boxes = from_pic(input_filename)
 # gtruth, v_labels_sequential = test_data()
-pred_sort, gtruth, fuzzy = generate_description(gtruth)
-print(verbalize_pred_pl(pred_sort, gtruth, fuzzy, v_labels_sequential))
+pred_sort, gtruth, fuzzy = generate_description(gtruth, boxes)
+print(verbalize_pred_pl(pred_sort, gtruth, fuzzy, v_labels_sequential, boxes))
 # print(verbalize_pred_eng(pred_sort, gtruth, fuzzy, v_labels_sequential))
 # print(verbalize_pred(pred_sort, gtruth, fuzzy))
 
