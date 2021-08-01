@@ -1,0 +1,11 @@
+lp, LP{_VERB M, D, B, N
+1, jeden, pierwsza, pierwszej, pierwszą, pierwszą
+2, dwoje, druga, drugiej, drugą, drugą
+3, trzy, trzecia, trzeciej, trzecią, trzecią
+4, cztery, czwarta, czwartej, czwartą, czwartą
+5, pięć, piąta, piątej, piątą, piątą
+6, sześć, szóśta, szóśtej, szóśtą, szóśtą
+7, siedem, siódma, siódmej, siódmą, siódmą
+8, osiem, ósma, ósmej, ósmą, ósmą
+9, dziewięć, dziewiąta, dziewiątej, dziewiątą, dziewiątą
+10, dziesięć, dziesiąta, dziesiątej, dziesiątą, dziesiątą
