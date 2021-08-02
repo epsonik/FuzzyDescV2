@@ -240,6 +240,19 @@ def get_seq_id(obj_name, id_from_predicate, boxes):
     return None
 
 
+def generate_preambule(v_labels_sequential, data_multilingual_obj_names, data_multilingual_obj_names_lm):
+    image_labels_counter = Counter(v_labels_sequential)
+    preambule = ''
+    for object_name in image_labels_counter.keys():
+        if image_labels_counter[object_name] > 1:
+            preambule = preambule.__add__(
+                " {B}, ".format_map(get_row(data_multilingual_obj_names_lm, object_name)))
+        else:
+            preambule = preambule.__add__(
+                " {B}, ".format_map(get_row(data_multilingual_obj_names, object_name)))
+    return preambule
+
+
 def verbalize_pred_pl(pred, scene, fuzzy, v_labels_sequential, boxes):
     gen_desc = "Na obrazie widzimy "
     zerolab = 1
@@ -250,20 +263,8 @@ def verbalize_pred_pl(pred, scene, fuzzy, v_labels_sequential, boxes):
     frameworks_orientation, \
     data_multilingual_obj_names, \
     data_multilingual_obj_names_lm = load_lang_data_pl()
-    image_labels_counter = Counter(v_labels_sequential)
 
-    def generate_preambule():
-        preambule = ''
-        for object_name in image_labels_counter.keys():
-            if image_labels_counter[object_name] > 1:
-                preambule = preambule.__add__(
-                    " {B}, ".format_map(get_row(data_multilingual_obj_names_lm, object_name)))
-            else:
-                preambule = preambule.__add__(
-                    " {B}, ".format_map(get_row(data_multilingual_obj_names, object_name)))
-        return preambule
-
-    preambule = generate_preambule()
+    preambule = generate_preambule(v_labels_sequential, data_multilingual_obj_names, data_multilingual_obj_names_lm)
     txt = txt.__add__(preambule)
     txt = txt.__add__("\n")
 
@@ -281,6 +282,8 @@ def verbalize_pred_pl(pred, scene, fuzzy, v_labels_sequential, boxes):
         framework_orientation = frameworks_orientation[orientation_name_curr][0]
         sentence = create_replacement(framework_location, data_multilingual_obj_names,
                                       [first_obj_name, second_obj_name])
+        sequence_id = get_seq_id(first_obj_name, int(curr_pred[0]), boxes)
+        txt = txt.__add__("{}".format(sequence_id))
         txt = txt.__add__(sentence)
         txt = txt.__add__(", ")
         txt = txt.__add__("{}".format(framework_orientation))
