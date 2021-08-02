@@ -326,7 +326,7 @@ def create_replacement(framework, data_object, resolved_obj_names, boxes, scene,
         sequence_id_verb_name = get_verb_numerical(sequence_id, object_row, object_case_name)
         s = "{" + a_string + "}"
         # sentence = sentence.replace(s, "{} {} {} ".format(sequence_id, sequence_id_verb_name,object_row[object_case_name]))
-        sentence = sentence.replace(s, object_row[object_case_name])
+        sentence = sentence.replace(s, "{} {} ".format(sequence_id_verb_name, object_row[object_case_name]))
     return sentence
 
 
