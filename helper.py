@@ -151,7 +151,7 @@ def sort_predicates(pred, fuzzy, order, gtruth, boxes):
     to_sort1 = np.insert(pred, pred.shape[1], pred[:, 5], axis=1)
     to_sort = pd.DataFrame(to_sort1).sort_values(by=order, ascending=False)
     to_sort = to_sort.to_numpy()
-    print(verbalize_pred(np.array(to_sort), gtruth, fuzzy, boxes))
+    # print(verbalize_pred(np.array(to_sort), gtruth, fuzzy, boxes))
     return to_sort
 
 
@@ -212,6 +212,19 @@ def load_lang_data_pl():
     return frameworks_location, frameworks_orientation, data_multilingual_obj_names, data_multilingual_obj_names_lm
 
 
+def load_numerical_data_pl():
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/liczebniki_M.csv")
+    numerical_M = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
+
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/liczebniki_Z.csv")
+    numerical_Z = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
+
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/liczebniki_N.csv")
+    numerical_N = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
+    numerical = {'M': numerical_M, 'Z': numerical_Z, 'N': numerical_N}
+    return numerical
+
+
 def load_lang_data_eng():
     data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "eng/location.csv")
     frameworks_location = pd.read_csv(data_path, delimiter=', ', engine='python', header=None).values
@@ -227,17 +240,6 @@ def load_lang_data_eng():
     data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "eng/yolov3.csv")
     data_multilingual_obj_names = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
     return frameworks_location, frameworks_orientation, data_multilingual_obj_names, data_multilingual_obj_names_lm
-
-
-def get_seq_id(obj_name, id_from_predicate, boxes):
-    key_id = attrgetter("id")
-    key_seq_id = attrgetter("seq_id")
-    if obj_name is not "scene":
-        boxes_for_label = boxes[obj_name]
-        for box in boxes_for_label:
-            if key_id(box) == int(id_from_predicate):
-                return key_seq_id(box)
-    return None
 
 
 def generate_preambule(v_labels_sequential, data_multilingual_obj_names, data_multilingual_obj_names_lm):
@@ -257,8 +259,6 @@ def verbalize_pred_pl(pred, scene, fuzzy, v_labels_sequential, boxes):
     gen_desc = "Na obrazie widzimy "
     zerolab = 1
     txt = gen_desc
-    # data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/location_pl.csv")
-    # location = pd.read_csv(data_path, delimiter=', ', engine='python').values
     frameworks_location, \
     frameworks_orientation, \
     data_multilingual_obj_names, \
@@ -281,9 +281,7 @@ def verbalize_pred_pl(pred, scene, fuzzy, v_labels_sequential, boxes):
         framework_location = frameworks_location[location_name_curr][0]
         framework_orientation = frameworks_orientation[orientation_name_curr][0]
         sentence = create_replacement(framework_location, data_multilingual_obj_names,
-                                      [first_obj_name, second_obj_name])
-        sequence_id = get_seq_id(first_obj_name, int(curr_pred[0]), boxes)
-        txt = txt.__add__("{}".format(sequence_id))
+                                      [first_obj_name, second_obj_name], boxes, scene, curr_pred)
         txt = txt.__add__(sentence)
         txt = txt.__add__(", ")
         txt = txt.__add__("{}".format(framework_orientation))
@@ -295,12 +293,26 @@ def find_name(data, name):
     return data[data[:, 0] == name, :][0]
 
 
-def get_row(data, name):
+def get_row(data, name, key='ENG'):
     return data.iloc[
-        data.index[data['ENG'] == name]].to_dict('records')[0]
+        data.index[data[key] == name]].to_dict('records')[0]
 
 
-def create_replacement(framework, data_multilingual_obj_names, predicate_ref_obj):
+def get_seq_id(obj_name, id_from_predicate, boxes):
+    key_id = attrgetter("id")
+    key_seq_id = attrgetter("seq_id")
+    if obj_name is not "scene":
+        boxes_for_label = boxes[obj_name]
+        for box in boxes_for_label:
+            if key_id(box) == int(id_from_predicate):
+                return key_seq_id(box)
+    return None
+
+
+def create_replacement(framework, data_object, resolved_obj_names, boxes, scene, curr_pred):
+    first_obj_name = scene.onames[scene.obj[int(curr_pred[0]), 1]]
+    second_obj_name = scene.onames[scene.obj[int(curr_pred[2]), 1]]
+
     regex = r'\{(.*?)\}'
     obj_places = re.findall(regex, framework)
     sentence = copy.copy(framework)
@@ -308,10 +320,30 @@ def create_replacement(framework, data_multilingual_obj_names, predicate_ref_obj
         result = a_string.split(":")
         object_case_name = result[0]
         object_place = int(result[1])
-        object_case = get_row(data_multilingual_obj_names, predicate_ref_obj[object_place])
+        sequence_id = get_seq_id(resolved_obj_names[object_place], int(curr_pred[0]), boxes)
+        object_row = get_row(data_object, resolved_obj_names[object_place])
+
+        sequence_id_verb_name = get_verb_numerical(sequence_id, object_row, object_case_name)
         s = "{" + a_string + "}"
-        sentence = sentence.replace(s, object_case[object_case_name])
+        # sentence = sentence.replace(s, "{} {} {} ".format(sequence_id, sequence_id_verb_name,object_row[object_case_name]))
+        sentence = sentence.replace(s, object_row[object_case_name])
     return sentence
+
+
+# object_case_name - case of noun
+# row from data file, with noun, kind of noun and cases of it
+# number of occurences of obj on image
+def get_verb_numerical(sequence_id, object_row, object_case_name):
+    if sequence_id is not None:
+        numerical = load_numerical_data_pl()
+        # femine, man, neuter rodzaj rzeczownika
+        object_kind = object_row['R']
+        obj_numericals = numerical[object_kind]
+        numerical_row = get_row(obj_numericals, sequence_id, 'LP')
+        numerical_verbal = numerical_row[object_case_name]
+        return numerical_verbal
+    else:
+        return ""
 
 
 def verbalize_pred_eng(pred, scene, fuzzy, v_labels_sequential):
