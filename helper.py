@@ -281,7 +281,8 @@ def verbalize_pred_pl(pred, scene, fuzzy, v_labels_sequential, boxes):
         framework_location = frameworks_location[location_name_curr][0]
         framework_orientation = frameworks_orientation[orientation_name_curr][0]
         sentence = create_replacement(framework_location, data_multilingual_obj_names,
-                                      [first_obj_name, second_obj_name], boxes, scene, curr_pred)
+                                      [first_obj_name, second_obj_name], boxes,
+                                      [int(curr_pred[0]), int(curr_pred[2])])
         txt = txt.__add__(sentence)
         txt = txt.__add__(", ")
         txt = txt.__add__("{}".format(framework_orientation))
@@ -309,10 +310,7 @@ def get_seq_id(obj_name, id_from_predicate, boxes):
     return None
 
 
-def create_replacement(framework, data_object, resolved_obj_names, boxes, scene, curr_pred):
-    first_obj_name = scene.onames[scene.obj[int(curr_pred[0]), 1]]
-    second_obj_name = scene.onames[scene.obj[int(curr_pred[2]), 1]]
-
+def create_replacement(framework, data_object, resolved_obj_names, boxes, resolved_obj_places):
     regex = r'\{(.*?)\}'
     obj_places = re.findall(regex, framework)
     sentence = copy.copy(framework)
@@ -320,12 +318,13 @@ def create_replacement(framework, data_object, resolved_obj_names, boxes, scene,
         result = a_string.split(":")
         object_case_name = result[0]
         object_place = int(result[1])
-        sequence_id = get_seq_id(resolved_obj_names[object_place], int(curr_pred[0]), boxes)
+        sequence_id = get_seq_id(resolved_obj_names[object_place], resolved_obj_places[object_place], boxes)
         object_row = get_row(data_object, resolved_obj_names[object_place])
 
         sequence_id_verb_name = get_verb_numerical(sequence_id, object_row, object_case_name)
         s = "{" + a_string + "}"
-        # sentence = sentence.replace(s, "{} {} {} ".format(sequence_id, sequence_id_verb_name,object_row[object_case_name]))
+        # sentence = sentence.replace(s, "{} {} {} ".format(sequence_id, sequence_id_verb_name,
+        #                                                   object_row[object_case_name]))
         sentence = sentence.replace(s, "{} {} ".format(sequence_id_verb_name, object_row[object_case_name]))
     return sentence
 
