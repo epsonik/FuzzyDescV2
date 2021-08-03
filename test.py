@@ -46,7 +46,7 @@ def from_pic(input_filename):
 
 # Prints in the console the variable as requested
 
-input_filename = "images/7775781830_e93c63f661_z.jpg"
+input_filename = "images/desk.jpg"
 photo_boxed_filename = input_filename.replace('.jpg', '_boxed.jpg')
 gtruth, v_labels_matlab, v_labels_sequential, boxes = from_pic(input_filename)
 # gtruth, v_labels_sequential = test_data()

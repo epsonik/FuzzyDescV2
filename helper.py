@@ -304,9 +304,10 @@ def get_seq_id(obj_name, id_from_predicate, boxes):
     key_seq_id = attrgetter("seq_id")
     if obj_name is not "scene":
         boxes_for_label = boxes[obj_name]
-        for box in boxes_for_label:
-            if key_id(box) == int(id_from_predicate):
-                return key_seq_id(box)
+        if len(boxes_for_label) > 1:
+            for box in boxes_for_label:
+                if key_id(box) == int(id_from_predicate):
+                    return key_seq_id(box)
     return None
 
 
@@ -323,9 +324,10 @@ def create_replacement(framework, data_object, resolved_obj_names, boxes, resolv
 
         sequence_id_verb_name = get_verb_numerical(sequence_id, object_row, object_case_name)
         s = "{" + a_string + "}"
-        # sentence = sentence.replace(s, "{} {} {} ".format(sequence_id, sequence_id_verb_name,
-        #                                                   object_row[object_case_name]))
-        sentence = sentence.replace(s, "{} {} ".format(sequence_id_verb_name, object_row[object_case_name]))
+        if sequence_id_verb_name is not '':
+            sentence = sentence.replace(s, "{} {} ".format(sequence_id_verb_name, object_row[object_case_name]))
+        sentence = sentence.replace(s, object_row[object_case_name])
+
     return sentence
 
 
