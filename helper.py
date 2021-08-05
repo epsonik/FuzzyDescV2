@@ -234,37 +234,42 @@ def load_lang_data_eng():
     frameworks_orientation = pd.read_csv(data_path, delimiter=', ', engine='python', header=None).values
     frameworks_orientation = dict(zip(frameworks_orientation[:, 0], frameworks_orientation[:, 1:]))
 
-    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "eng/yolov3_LM.csv")
-    data_multilingual_obj_names_lm = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
-
     data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "eng/yolov3.csv")
     data_multilingual_obj_names = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
-    return frameworks_location, frameworks_orientation, data_multilingual_obj_names, data_multilingual_obj_names_lm
+    return frameworks_location, frameworks_orientation, data_multilingual_obj_names
 
 
-def generate_preambule(v_labels_sequential, data_multilingual_obj_names, data_multilingual_obj_names_lm):
-    image_labels_counter = Counter(v_labels_sequential)
-    preambule = ''
-    for object_name in image_labels_counter.keys():
-        if image_labels_counter[object_name] > 1:
+def generate_preambule(data_multilingual_obj_names, data_multilingual_obj_names_lm, boxes):
+    preambule = 'Na obrazie widzimy '
+    for object_name in boxes.keys():
+        number_of_obj_for_label = len(boxes[object_name])
+        if len(boxes[object_name]) > 1:
+            numerical = load_numerical_data_pl()
+            obj_numericals = numerical['M']
+            numerical_row = get_row(obj_numericals, number_of_obj_for_label, 'LP')
+            numerical_verbal = numerical_row['LP_VERB']
+            preambule = preambule.__add__(numerical_verbal)
             preambule = preambule.__add__(
-                " {B}, ".format_map(get_row(data_multilingual_obj_names_lm, object_name)))
+                " {B}".format_map(get_row(data_multilingual_obj_names_lm, object_name)))
         else:
             preambule = preambule.__add__(
-                " {B}, ".format_map(get_row(data_multilingual_obj_names, object_name)))
-    return preambule
+                "{B}".format_map(get_row(data_multilingual_obj_names, object_name)))
+        if object_name == list(boxes.keys())[-1]:
+            preambule = preambule.__add__(".")
+        else:
+            preambule = preambule.__add__(", ")
+    return preambule.capitalize()
 
 
-def verbalize_pred_pl(pred, scene, fuzzy, v_labels_sequential, boxes):
-    gen_desc = "Na obrazie widzimy "
+def verbalize_pred_pl(pred, scene, fuzzy, boxes):
     zerolab = 1
-    txt = gen_desc
+    txt = ""
     frameworks_location, \
     frameworks_orientation, \
     data_multilingual_obj_names, \
     data_multilingual_obj_names_lm = load_lang_data_pl()
 
-    preambule = generate_preambule(v_labels_sequential, data_multilingual_obj_names, data_multilingual_obj_names_lm)
+    preambule = generate_preambule(data_multilingual_obj_names, data_multilingual_obj_names_lm, boxes)
     txt = txt.__add__(preambule)
     txt = txt.__add__("\n")
 
@@ -283,9 +288,11 @@ def verbalize_pred_pl(pred, scene, fuzzy, v_labels_sequential, boxes):
         sentence = create_replacement(framework_location, data_multilingual_obj_names,
                                       [first_obj_name, second_obj_name], boxes,
                                       [int(curr_pred[0]), int(curr_pred[2])])
+        sentence = sentence.capitalize()
         txt = txt.__add__(sentence)
         txt = txt.__add__(", ")
         txt = txt.__add__("{}".format(framework_orientation))
+        txt = txt.__add__(".")
         txt = txt.__add__("\n")
     return txt
 
@@ -311,7 +318,7 @@ def get_seq_id(obj_name, id_from_predicate, boxes):
     return None
 
 
-def create_replacement(framework, data_object, resolved_obj_names, boxes, resolved_obj_places):
+def create_replacement(framework, data_object, resolved_obj_names_array, boxes, resolved_obj_places_array):
     regex = r'\{(.*?)\}'
     obj_places = re.findall(regex, framework)
     sentence = copy.copy(framework)
@@ -319,13 +326,13 @@ def create_replacement(framework, data_object, resolved_obj_names, boxes, resolv
         result = a_string.split(":")
         object_case_name = result[0]
         object_place = int(result[1])
-        sequence_id = get_seq_id(resolved_obj_names[object_place], resolved_obj_places[object_place], boxes)
-        object_row = get_row(data_object, resolved_obj_names[object_place])
+        sequence_id = get_seq_id(resolved_obj_names_array[object_place], resolved_obj_places_array[object_place], boxes)
+        object_row = get_row(data_object, resolved_obj_names_array[object_place])
 
         sequence_id_verb_name = get_verb_numerical(sequence_id, object_row, object_case_name)
         s = "{" + a_string + "}"
         if sequence_id_verb_name is not '':
-            sentence = sentence.replace(s, "{} {} ".format(sequence_id_verb_name, object_row[object_case_name]))
+            sentence = sentence.replace(s, "{} {}".format(sequence_id_verb_name, object_row[object_case_name]))
         sentence = sentence.replace(s, object_row[object_case_name])
 
     return sentence
@@ -348,92 +355,7 @@ def get_verb_numerical(sequence_id, object_row, object_case_name):
 
 
 def verbalize_pred_eng(pred, scene, fuzzy, v_labels_sequential):
-    zerolab = 1
-    txt = gen_desc
-    frameworks_location, \
-    frameworks_orientation, \
-    data_multilingual_obj_names, \
-    data_multilingual_obj_names_lm = load_lang_data_eng()
-
-    image = Counter(v_labels_sequential)
-    for object_name in image.keys():
-        if image[object_name] > 1:
-            txt = txt.__add__("{}, ".format(find_name(data_multilingual_obj_names_lm, object_name)[0] + "s"))
-        else:
-            txt = txt.__add__("{}, ".format(find_name(data_multilingual_obj_names, object_name)[0]))
-
-    txt = txt.__add__("\n")
-
-    for i in range(len(pred)):
-        curr_pred = pred[i, :]
-        ty = int(curr_pred[4])
-        tname_curr = fuzzy.lev3.tname[ty]
-
-        o = int(curr_pred[6])
-        oname_curr = fuzzy.lev3.oname[o]
-        first_obj_name = scene.onames[scene.obj[int(curr_pred[0]), 1]]
-        second_obj_name = scene.onames[scene.obj[int(curr_pred[2]), 1]]
-        if (tname_curr is TOUCHING):
-            txt = txt.__add__(
-                touching.format(pred[i, 2] - zerolab, find_name(data_multilingual_obj_names, second_obj_name)[EN],
-                                pred[i, 0] - zerolab, find_name(data_multilingual_obj_names, first_obj_name)[EN]))
-            if (oname_curr == ABOVE):
-                txt = txt.__add__(" from above")
-            if (oname_curr == LEFT_ABOVE):
-                txt = txt.__add__(" on the left upper corner")
-            if (oname_curr == RIGHT_ABOVE):
-                txt = txt.__add__(" on the right upper corner")
-            if (oname_curr == BELOW):
-                txt = txt.__add__(" below")
-            if (oname_curr == LEFT_BELOW):
-                txt = txt.__add__(" on the left below corneru")
-            if (oname_curr == RIGHT_BELOW):
-                txt = txt.__add__(" on the right below corner")
-            if (oname_curr == LEFT):
-                txt = txt.__add__(" on the left")
-            if (oname_curr == RIGHT):
-                txt = txt.__add__(" on the right")
-        if (tname_curr is CROSSING):
-            txt = txt.__add__(
-                crossing.format(pred[i, 2] - zerolab, find_name(data_multilingual_obj_names, second_obj_name)[EN],
-                                pred[i, 0] - zerolab, find_name(data_multilingual_obj_names, first_obj_name)[EN]))
-            if (oname_curr == ABOVE):
-                txt = txt.__add__(" from above")
-            if (oname_curr == LEFT_ABOVE):
-                txt = txt.__add__(" on the left upper corner")
-            if (oname_curr == RIGHT_ABOVE):
-                txt = txt.__add__(" on the right upper corner")
-            if (oname_curr == BELOW):
-                txt = txt.__add__(" below")
-            if (oname_curr == LEFT_BELOW):
-                txt = txt.__add__(" on the left below corner")
-            if (oname_curr == RIGHT_BELOW):
-                txt = txt.__add__(" on the right below corner")
-            if (oname_curr == LEFT):
-                txt = txt.__add__(" on the left")
-            if (oname_curr == RIGHT):
-                txt = txt.__add__(" on the right")
-        if (tname_curr is CLOSE):
-            txt = txt.__add__(
-                crossing.format(pred[i, 2] - zerolab, find_name(data_multilingual_obj_names, second_obj_name)[EN],
-                                pred[i, 0] - zerolab, find_name(data_multilingual_obj_names, first_obj_name)[EN]))
-            if (oname_curr == ABOVE):
-                txt = txt.__add__(" from above")
-            if (oname_curr == LEFT_ABOVE):
-                txt = txt.__add__(" on the left upper corner")
-            if (oname_curr == RIGHT_ABOVE):
-                txt = txt.__add__(" on the right upper corner")
-            if (oname_curr == BELOW):
-                txt = txt.__add__(" below")
-            if (oname_curr == LEFT_BELOW):
-                txt = txt.__add__(" on the left below corner")
-            if (oname_curr == RIGHT_BELOW):
-                txt = txt.__add__(" on the right below corner")
-            if (oname_curr == LEFT):
-                txt = txt.__add__(" on the left")
-            if (oname_curr == RIGHT):
-                txt = txt.__add__(" on the right")
-        txt = txt.__add__("\n")
+    txt = ''
     return txt
 
 
@@ -444,4 +366,5 @@ def generate_description(gtruth, boxes):
     pred = get_predicates(fmpm_mat, gtruth, fuzzy)
     to_sort = sort_predicates(pred, fuzzy, [1, 5, 8, 3], gtruth, boxes)
     pred_filtered = filter_predicates(to_sort, gtruth)
+    print(verbalize_pred(np.array(pred_filtered), gtruth, fuzzy, boxes))
     return pred_filtered, gtruth, fuzzy
