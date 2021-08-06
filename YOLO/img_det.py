@@ -164,16 +164,13 @@ def return_coordinates(v_boxes, v_labels, image_w, image_h):
         def check_labels(lab):
             if lab not in v_labels_matlab:
                 v_labels_matlab.append(lab)
-                boxes[lab] = [Box(box, v_labels[idx], 1, obj_number)]
-            else:
-                boxes[lab].append(Box(box, v_labels[idx], len(boxes[lab]) + 1, obj_number))
             return v_labels_matlab.index(lab)
 
         b = [obj_number, check_labels(v_labels[idx]), x1, y1, width, height]
         v_boxes_matlab.append(b)
         v_labels_matlab_sequential.append(v_labels[idx])
         obj_number += 1
-    return v_boxes_matlab, v_labels_matlab, v_labels_matlab_sequential, boxes
+    return v_boxes_matlab, v_labels_matlab, v_labels_matlab_sequential
 
 
 # draw all results

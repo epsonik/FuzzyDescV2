@@ -13,6 +13,7 @@ import pandas as pd
 #  macierz wyjsciowa:
 #  wiersze - obiekty referencyjne - względem nich określamy położenie
 #  kolumny - obiekty dla których określamy położenie
+from YOLO.img_det import Box
 from data import *
 from eng.szablony_eng import *
 
@@ -145,7 +146,7 @@ def get_predicates(fmpm_mat, scene, fuzzy):
     return np.array(plist)
 
 
-def sort_predicates(pred, fuzzy, order, gtruth, boxes):
+def sort_predicates(pred, order):
     # liczba obiektów na obrazie
 
     to_sort1 = np.insert(pred, pred.shape[1], pred[:, 5], axis=1)
@@ -262,7 +263,6 @@ def generate_preambule(data_multilingual_obj_names, data_multilingual_obj_names_
 
 
 def verbalize_pred_pl(pred, scene, fuzzy, boxes):
-    zerolab = 1
     txt = ""
     frameworks_location, \
     frameworks_orientation, \
@@ -272,7 +272,6 @@ def verbalize_pred_pl(pred, scene, fuzzy, boxes):
     preambule = generate_preambule(data_multilingual_obj_names, data_multilingual_obj_names_lm, boxes)
     txt = txt.__add__(preambule)
     txt = txt.__add__("\n")
-
     for i in range(len(pred)):
         curr_pred = pred[i, :]
         ty = int(curr_pred[4])
@@ -295,6 +294,27 @@ def verbalize_pred_pl(pred, scene, fuzzy, boxes):
         txt = txt.__add__(".")
         txt = txt.__add__("\n")
     return txt
+
+
+def count_ids(pred, scene):
+    boxes2 = dict()
+
+    for i in range(len(pred)):
+        curr_pred = pred[i, :]
+        first_obj_name = scene.onames[scene.obj[int(curr_pred[0]), 1]]
+        second_obj_name = scene.onames[scene.obj[int(curr_pred[2]), 1]]
+
+        def check_labels(object_name, obj_number):
+            if object_name not in boxes2:
+                boxes2[object_name] = [Box(None, object_name, 1, obj_number)]
+            else:
+                key_id = attrgetter("id")
+                if not any(key_id(i) == obj_number for i in boxes2[object_name]):
+                    boxes2[object_name].append(Box(None, object_name, len(boxes2[object_name]) + 1, obj_number))
+
+        check_labels(first_obj_name, int(curr_pred[0]))
+        check_labels(second_obj_name, int(curr_pred[2]))
+    return boxes2
 
 
 def find_name(data, name):
@@ -359,12 +379,11 @@ def verbalize_pred_eng(pred, scene, fuzzy, v_labels_sequential):
     return txt
 
 
-def generate_description(gtruth, boxes):
+def generate_description(gtruth):
     fuzzy = load_etykiety()
     fmpm_mat = fmpm(gtruth, fuzzy)
 
     pred = get_predicates(fmpm_mat, gtruth, fuzzy)
-    to_sort = sort_predicates(pred, fuzzy, [1, 5, 8, 3], gtruth, boxes)
+    to_sort = sort_predicates(pred, [1, 5, 8, 3])
     pred_filtered = filter_predicates(to_sort, gtruth)
-    print(verbalize_pred(np.array(pred_filtered), gtruth, fuzzy, boxes))
     return pred_filtered, gtruth, fuzzy
