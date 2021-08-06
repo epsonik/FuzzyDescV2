@@ -1,5 +1,5 @@
 ENG, R, M, D, B, N
-person, M, człowiek, człowieka, człowieka, człowiekiem
+person, Z, osoba, osoby, osobę, osobą
 bicycle, M, rower, roweru, rower, rowerem
 car, M, samochód, samochodu, samochód, samochodem
 motorcycle, M, motocykl, motocykla, motocykl, motocyklem
@@ -40,7 +40,7 @@ surfboard, Z, deska surfingowa, deski surfingowej, deskę seufingową, deską su
 tennis racket, Z, rakieta tenisowa, rakiety tenisowej, rakietę tenisową, rakietą tenisową
 bottle, Z, butelka, butelki, butelkę, butelką
 wine glass, M, kieliszek wina, kieliszka wina, kieliszek wina, kieliszkiem wina
-cup, M, kubek, kubka, kubek, kubkiem
+cup, Z, szklanka, szklanki, szklankę, szklanką
 fork, M, widelec, widelca, widelec, widelcem
 knife, M, nóż, noża, nóż, nożem
 spoon, Z, łyżka, łyżki, łyżkę, łyżką
@@ -62,7 +62,7 @@ bed, N, łóżko, łóżka, łóżko, łóżkiem
 dining table, M, stół obiadowy, stołu obiadowego, stół obiadowy, stołem obiadowym
 toilet, Z, toaleta, toalety, toaletę, toaletą
 tv, M, telewizor, telewizora, telewizor, telewizorem
-laptop, M, laptop, laptopa, laptop, laptopem
+laptop, M, laptop, laptopa, laptopa, laptopem
 mouse, Z, mysz komputerowa, myszy komputerowej, mysz komputerową, myszą komputerową
 remote, M, pilot do telewizora, pilota do telewizora, pilot do telewizora, pilotem do telewizora
 keyboard, Z, klawiatura, klawiatury, klawiaturę, klawiaturą

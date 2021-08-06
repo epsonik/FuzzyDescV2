@@ -2,6 +2,7 @@
 # based on https://github.com/experiencor/keras-yolo3
 import os
 from collections import Counter
+from operator import attrgetter
 
 import numpy as np
 from keras.models import load_model
@@ -174,7 +175,7 @@ def return_coordinates(v_boxes, v_labels, image_w, image_h):
 
 
 # draw all results
-def draw_boxes(filename, photo_boxed_filename, v_boxes, v_labels):
+def draw_boxes(filename, photo_boxed_filename, v_boxes, v_labels, boxes):
     # load the image
     data = pyplot.imread(filename)
     # plot the image
@@ -193,8 +194,16 @@ def draw_boxes(filename, photo_boxed_filename, v_boxes, v_labels):
         rect = Rectangle((x1, y1), width, height, fill=False, color='white')
         # draw the box
         ax.add_patch(rect)
+
         # draw text and score in top left corner
-        label = "%s %d" % (v_labels[i], i - 1)
+
+        def get_se(bb, i):
+            for x in bb:
+                key_id = attrgetter("id")
+                if (key_id(x) == i):
+                    return x.seq_id
+
+        label = "%s %d" % (v_labels[i], get_se(boxes[v_labels[i]], i))
         pyplot.text(x1, y1, label, color='red')
     # show the plot
     pyplot.savefig(photo_boxed_filename)
