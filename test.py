@@ -59,7 +59,7 @@ def for_img(input_filename):
 
 # Prints in the console the variable as requested
 
-# input_filename = "images/7775781830_e93c63f661_z.jpg"
-# for_img(input_filename)
-input_filename = "images/6813627120_a222bcba0d_z.jpg"
-for_img(input_filename)
+for_img("images/7775781830_e93c63f661_z.jpg")
+for_img("images/3119362097_98b99c9ff5_z.jpg")
+for_img("images/6813627120_a222bcba0d_z.jpg")
+for_img("images/desk.jpg")

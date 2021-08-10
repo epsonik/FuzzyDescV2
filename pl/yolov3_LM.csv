@@ -1,82 +1,82 @@
-ENG, M, D, B, N
-person, człowiek, człowieka, człowieka, człowiekiem
-bicycle, rower, roweru, rower, rowerem
-car, samochód, samochodu, samochód, samochodem
-motorcycle, motocykl, motocykla, motocykl, motocyklem
-airplane, samolot, samolotu, samolot, samolotem
-bus, autobus, autobusu,autobus, autobusem
-train, pociąg, pociągu, pociąg, pociągiem
-truck, półciężarówka, półciężarówki, półciężarówkę, półciężarówką
-boat, łódź, łodzi, łódź, łodzią
-traffic light, sygnalizator świetlny, sygnalizatora świetlnego, sygnalizator świetlny, sygnalizatorem świetlnym
-fire hydrant, hydrant, hydrantu, hydrant, hydrantem
-stop sign, znak stop, znaku stopu, znak stopu, znakiem stopu
-parking meter, parkometr, parkometru, parkometr, parkometrem
-bench, ławka, ławki, ławkę, ławką
-bird, ptak, ptaka, ptaka, ptakiem
-cat, kot, kota, kota, kotem
-dog, pies, psa, psa, psem
-horse, koń, konia, konia, koniem
-sheep, owca, owcy, owcę, owcą
-cow, krowa, krowy, krowę, krową
-elephant, słoń, słonia, słonia, słoniem
-bear, niedźwiedź, niedźwiedzia, niedźwiedzia, niedźwiedziem
-zebra, zebra, zebry, zebrę, zebrą
-giraffe, żyrafa, żyrafy, żyrafę, żyrafą
-backpack, plecak, plecaka, plecak, plecakiem
-umbrella, parasol, parasola, parasol, parasolem
-handbag, torebka, torebki, torebkę, torebką
-tie, krawat, krawata, krawat, krawatem
-suitcase, walizka, walizki, walizkę, walizką
-frisbee, frisbee, frisbee, frisbee, frisbee
-skis, narty, nart, narty, nartami
-snowboard, snowboard, snowboardu, snowboard, snowboardem
-sports ball, piłka sportowa, piłki sportowej, piłkę sportową, piłką sportową
-kite, latawiec, latawca, latawiec, latawcem
-baseball bat, kij bejsbolowy, kija bejsbolowego, kij bejsbolowy, kijem bejsbolowym
-baseball glove, rękawica bejsbolowa, rękawicy bejsbolowej, rękawicę bejsbolową, rękawicą bejsbolowa
-skateboard, deska skejtbordowa, deski skejtbordowej, deskę skejtbordową, deską skejtbordową
-surfboard, deska surfingowa, deski surfingowej, deskę surfingową, deską surfingowa
-tennis racket, rakieta tenisowa, rakiety tenisowej, rakietę tenisową, rakietą tenisową
-bottle, butelka, butelki, butelkę, butelką
-wine glass, kieliszek wina, kieliszka wina, kieliszek wina, kieliszkiem wina
-cup, kubek, kubka, kubek, kubkiem
-fork, widelec, widelca, widelec, widelcem
-knife, nóż, noża, nóż, nożem
-spoon, łyżka, łyżki, łyżkę, łyżką
-bowl, miska, miski, miskę, miską
-banana, banan, banana, banana, bananem
-apple, jabłko, jabłka, jabłko, jabłkiem
-sandwich, kanapka, kanapki, kanapkę, kanapką
-orange, pomarańcza, pomarańczy, pomarańczę, pomarańczą
-broccoli, brokuł, brokuła, brokuł, brokułem
-carrot, marchew, marchwi, marchew, marchwią
-hot dog, hot dog, hot doga, hot doga, hot dogiem
-pizza, pizza, pizzy, pizzę, pizzą
-donut, pączek, pączka, pączek, pączkiem
-cake, ciastko, ciastka, ciastko, ciastkiem,
-chair, krzesła, krzeseł, krzesła, krzesłami
-couch, kanapa, kanapy, kanapę, kanapą
-potted plant, rośliny w doniczce, roślin w doniczkach, rośliny w doniczkach, roślinami w doniczkach
-bed, łóżka, łóżek, łóżka, łóżkami
-dining table, stół obiadowy, stołu obiadowego, stół obiadowy, stołem obiadowym
-toilet, toaleta, toalety, toaletę, toaletą
-tv, telewizory, telewizorów, telewizory, telewizorami
-laptop, laptopy, laptopów, laptopy, laptopami
-mouse, mysz komputerowa, myszy komputerowej, mysz komputerową, myszą komputerową
-remote, pilot do telewizora, pilota do telewizora, pilot do telewizora, pilotem do telewizora
-keyboard, klawiatury, klawiatur, klawiatury, klawiaturami
-cell phone, telefon komórkowy, telefonu komórkowego, telefon komórkowy, telefonem komórkowym
-microwave, mikrofalówki, mikrofalówek, mikrofalówki, mikrofalówkami
-oven, piekarnik, piekarnika, piekarnik, piekarnikiem
-toaster, toster, tostera, toster, tosterem
-sink, zlew, zlewu, zlew, zlewem
-refrigerator, lodówki, lodówek, lodówki, lodówkami
-book, książki, książek, książki, książkami
-clock, zegar, zegara, zegar, zegarem
-vase, wazon, wazonu, wazon, wazonem
-scissors, nożyczki, nożyczek, nożyczki, nożyczkami
-teddy bear, pluszowy miś, pluszowego misia, pluszowego misia,  pluszowym misiem,
-hair drier, suszarka do włosów, suszarki do włosów, suszarkę do włosów, suszarką do włosów,
-toothbrush, szczoteczka do zębów, szczoteczki do zębów, szczoteczkę do zębów, szczoteczką do zębów
-scene, scena, sceny, scenę, sceną
+ENG, R, M, B
+person, ludzie
+bicycle, NM, rowery
+car, NM, samochody
+motorcycle,NM,  motocykle, motocykle
+airplane, NM, samoloty, samoloty
+bus, NM, autobusy, autobusy
+train, NM, pociągi,
+truck, Z, półciężarówki
+boat, Z, łódzie
+traffic light, NM, sygnalizatory świetlne
+fire hydrant, NM, hydranty
+stop sign, NM, znaki stopu
+parking meter, NM, parkometry
+bench, Z, ławki
+bird, ptak, NM, ptaki
+cat, NM, koty
+dog, NM, psy
+horse, NM, konie
+sheep, Z, owce
+cow, Z, krowy
+elephant, NM, słonie
+bear, NM, niedźwiedzie
+zebra, Z, zebry
+giraffe, Z, żyrafy
+backpack, NM, plecaki
+umbrella, NM, parasole
+handbag, Z, torebki
+tie, NM, krawaty
+suitcase, Z, walizki
+frisbee, NM, frisbee
+skis, narty
+snowboard, NM, snowboard
+sports ball, Z, piłki sportowe
+kite, NM, latawce
+baseball bat, NM, kije bejsbolowe,
+baseball glove, Z, rękawice bejsbolowe
+skateboard, Z, deski skejtbordowe
+surfboard, Z, deski surfingowe
+tennis racket, Z, rakiety tenisowe
+bottle, Z,butelki
+wine glass, NM, kieliszki do wina
+cup, NM, kubki
+fork, NM, widelce
+knife, NM, noże
+spoon, Z, łyżki
+bowl, Z, miski
+banana, NM, banany
+apple, NM, jabłka
+sandwich, Z, kanapki
+orange, Z, pomarańcze
+broccoli, NM, brokuły
+carrot, NM, marchwie
+hot dog, NM, hot dogi
+pizza, Z, pizze
+donut, NM, pączki
+cake, NM, ciastka
+chair, NM, krzesła
+couch, Z, kanapy
+potted plant, Z, rośliny w doniczce
+bed, NM, łóżka
+dining table, NM, stoły obiadowe
+toilet, Z, toalety
+tv, NM, telewizory
+laptop, NM, laptopy
+mouse, Z, myszy komputerowe
+remote, NM, piloty do telewizora
+keyboard, Z, klawiatury
+cell phone, NM, telefony komórkowe
+microwave, Z, mikrofalówki
+oven, NM, piekarniki
+toaster, NM, tostery
+sink,  NM, zlewy
+refrigerator, Z, lodówki
+book, Z, książki
+clock, zegary
+vase, NM, wazony
+scissors, Z, nożyczki
+teddy bear, NM, pluszowe misie
+hair drier, Z, suszarki do włosów
+toothbrush, Z, szczoteczki do zębów
+scene, Z, sceny

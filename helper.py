@@ -214,15 +214,28 @@ def load_lang_data_pl():
 
 
 def load_numerical_data_pl():
-    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/liczebniki_M.csv")
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/order_numerals/liczebniki_M.csv")
     numerical_M = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
 
-    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/liczebniki_Z.csv")
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/order_numerals/liczebniki_Z.csv")
     numerical_Z = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
 
-    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/liczebniki_N.csv")
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/order_numerals/liczebniki_N.csv")
     numerical_N = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
     numerical = {'M': numerical_M, 'Z': numerical_Z, 'N': numerical_N}
+    return numerical
+
+
+def load_numerical_data_lm_pl():
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/main_numerals/liczebniki_MO.csv")
+    numerical_MO = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
+
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/main_numerals/liczebniki_NMO.csv")
+    numerical_NMO = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
+
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/main_numerals/liczebniki_Z.csv")
+    numerical_Z = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
+    numerical = {'MO': numerical_MO, 'NM': numerical_NMO, 'Z': numerical_Z}
     return numerical
 
 
@@ -242,23 +255,38 @@ def load_lang_data_eng():
 
 def generate_preambule(data_multilingual_obj_names, data_multilingual_obj_names_lm, boxes):
     preambule = 'Na obrazie widzimy '
+    framework = " {B}"
     for object_name in boxes.keys():
         number_of_obj_for_label = len(boxes[object_name])
-        if len(boxes[object_name]) > 1:
-            numerical = load_numerical_data_pl()
-            obj_numericals = numerical['M']
-            numerical_row = get_row(obj_numericals, number_of_obj_for_label, 'LP')
-            numerical_verbal = numerical_row['LP_VERB']
-            preambule = preambule.__add__(numerical_verbal)
-            preambule = preambule.__add__(
-                " {B}".format_map(get_row(data_multilingual_obj_names_lm, object_name)))
-        else:
-            preambule = preambule.__add__(
-                "{B}".format_map(get_row(data_multilingual_obj_names, object_name)))
-        if object_name == list(boxes.keys())[-1]:
-            preambule = preambule.__add__(".")
-        else:
-            preambule = preambule.__add__(", ")
+        if object_name is not "scene":
+            if len(boxes[object_name]) > 1:
+                def create_replacement_lm(number_of_obj_for_label):
+                    regex = r'\{(.*?)\}'
+                    obj_places = re.findall(regex, framework)
+                    sentence = copy.copy(framework)
+                    for a_string in obj_places:
+                        object_case_name = a_string
+                        object_row = get_row(data_multilingual_obj_names_lm, object_name)
+                        numerical = load_numerical_data_lm_pl()
+                        verbal_name = get_verb_numerical(number_of_obj_for_label, object_row,
+                                                                   object_case_name, numerical)
+                        s = "{" + a_string + "}"
+                        if verbal_name is not '':
+                            sentence = sentence.replace(s,
+                                                        "{} {}".format(verbal_name,
+                                                                       object_row[object_case_name]))
+                        sentence = sentence.replace(s, object_row[object_case_name])
+                    return sentence
+
+                sentence = create_replacement_lm(number_of_obj_for_label)
+                preambule = preambule.__add__(sentence)
+            else:
+                preambule = preambule.__add__(
+                    "{B}".format_map(get_row(data_multilingual_obj_names, object_name)))
+            if object_name == list(boxes.keys())[-1]:
+                preambule = preambule.__add__(".")
+            else:
+                preambule = preambule.__add__(", ")
     return preambule.capitalize()
 
 
@@ -348,8 +376,8 @@ def create_replacement(framework, data_object, resolved_obj_names_array, boxes, 
         object_place = int(result[1])
         sequence_id = get_seq_id(resolved_obj_names_array[object_place], resolved_obj_places_array[object_place], boxes)
         object_row = get_row(data_object, resolved_obj_names_array[object_place])
-
-        sequence_id_verb_name = get_verb_numerical(sequence_id, object_row, object_case_name)
+        numerical = load_numerical_data_pl()
+        sequence_id_verb_name = get_verb_numerical(sequence_id, object_row, object_case_name, numerical)
         s = "{" + a_string + "}"
         if sequence_id_verb_name is not '':
             sentence = sentence.replace(s, "{} {}".format(sequence_id_verb_name, object_row[object_case_name]))
@@ -361,9 +389,8 @@ def create_replacement(framework, data_object, resolved_obj_names_array, boxes, 
 # object_case_name - case of noun
 # row from data file, with noun, kind of noun and cases of it
 # number of occurences of obj on image
-def get_verb_numerical(sequence_id, object_row, object_case_name):
+def get_verb_numerical(sequence_id, object_row, object_case_name, numerical):
     if sequence_id is not None:
-        numerical = load_numerical_data_pl()
         # femine, man, neuter rodzaj rzeczownika
         object_kind = object_row['R']
         obj_numericals = numerical[object_kind]
