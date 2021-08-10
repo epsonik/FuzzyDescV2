@@ -1,10 +1,10 @@
-ENG, R, M, B
-person, ludzie
+ENG, R, B
+person, NM, ludzie
 bicycle, NM, rowery
 car, NM, samochody
-motorcycle,NM,  motocykle, motocykle
-airplane, NM, samoloty, samoloty
-bus, NM, autobusy, autobusy
+motorcycle, NM,  motocykle
+airplane, NM, samoloty
+bus, NM, autobusy
 train, NM, pociągi,
 truck, Z, półciężarówki
 boat, Z, łódzie
@@ -13,7 +13,7 @@ fire hydrant, NM, hydranty
 stop sign, NM, znaki stopu
 parking meter, NM, parkometry
 bench, Z, ławki
-bird, ptak, NM, ptaki
+bird, NM, ptaki
 cat, NM, koty
 dog, NM, psy
 horse, NM, konie

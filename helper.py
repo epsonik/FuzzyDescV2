@@ -227,15 +227,13 @@ def load_numerical_data_pl():
 
 
 def load_numerical_data_lm_pl():
-    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/main_numerals/liczebniki_MO.csv")
-    numerical_MO = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
 
     data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/main_numerals/liczebniki_NMO.csv")
     numerical_NMO = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
 
     data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/main_numerals/liczebniki_Z.csv")
     numerical_Z = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
-    numerical = {'MO': numerical_MO, 'NM': numerical_NMO, 'Z': numerical_Z}
+    numerical = {'NM': numerical_NMO, 'Z': numerical_Z}
     return numerical
 
 
