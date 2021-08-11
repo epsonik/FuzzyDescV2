@@ -61,3 +61,4 @@ def for_img(input_filename):
 # Prints in the console the variable as requested
 d = './images'
 print([for_img(d+"/"+f) for f in os.listdir(d)])
+# for_img("./images/3.jpg")

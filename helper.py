@@ -198,7 +198,7 @@ def verbalize_pred(pred, scene, fuzzy, boxes):
 
 def load_lang_data_pl():
     data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/location.csv")
-    frameworks_location = pd.read_csv(data_path, delimiter=', ', engine='python', header=None).values
+    frameworks_location = pd.read_csv(data_path, delimiter='; ', engine='python', header=None).values
     frameworks_location = dict(zip(frameworks_location[:, 0], frameworks_location[:, 1:]))
 
     data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/orientation.csv")
@@ -330,14 +330,11 @@ def verbalize_pred_pl(pred, scene, fuzzy, boxes):
 
         framework_location = frameworks_location[location_name_curr][0]
         framework_orientation = frameworks_orientation[orientation_name_curr][0]
-        sentence = create_replacement(framework_location, data_multilingual_obj_names,
+        sentence = create_replacement(framework_location, framework_orientation, data_multilingual_obj_names,
                                       [first_obj_name, second_obj_name], boxes,
                                       [int(curr_pred[0]), int(curr_pred[2])])
         sentence = sentence.capitalize()
         txt = txt.__add__(sentence)
-        txt = txt.__add__(", ")
-        txt = txt.__add__("{}".format(framework_orientation))
-        txt = txt.__add__(".")
         txt = txt.__add__("\n")
     return txt
 
@@ -384,11 +381,13 @@ def get_seq_id(obj_name, id_from_predicate, boxes):
     return None
 
 
-def create_replacement(framework, data_object, resolved_obj_names_array, boxes, resolved_obj_places_array):
-    regex = r'\{(.*?)\}'
-    obj_places = re.findall(regex, framework)
-    sentence = copy.copy(framework)
-    for a_string in obj_places:
+def create_replacement(framework_location, framework_orientation, data_object, resolved_obj_names_array, boxes,
+                       resolved_obj_places_array):
+    regex_location = r'\{(.*?)\}'
+
+    obj_places_location = re.findall(regex_location, framework_location)
+    sentence = copy.copy(framework_location)
+    for a_string in obj_places_location:
         result = a_string.split(":")
         object_case_name = result[0]
         object_place = int(result[1])
@@ -401,6 +400,10 @@ def create_replacement(framework, data_object, resolved_obj_names_array, boxes, 
             sentence = sentence.replace(s, "{} {}".format(sequence_id_verb_name, object_row[object_case_name]))
         sentence = sentence.replace(s, object_row[object_case_name])
 
+    regex_orientation = r'\[(.*?)\]'
+    obj_places_orientation = re.findall(regex_orientation, framework_location)
+    s = "[" + obj_places_orientation[0] + "]"
+    sentence = sentence.replace(s, framework_orientation)
     return sentence
 
 
