@@ -10,7 +10,8 @@ from itertools import repeat
 from YOLO.img_det import vbox_engine, draw_boxes, return_coordinates
 import numpy as np
 
-from helper import generate_description, verbalize_pred_pl, verbalize_pred, verbalize_pred_eng, get_seq_id, count_ids
+from helper import generate_description, count_ids
+from pl.helper_pl import verbalize_pred_pl
 from t import test_data
 
 
@@ -61,5 +62,5 @@ def for_img(input_filename):
 
 # Prints in the console the variable as requested
 d = './images'
-print([for_img(d+"/"+f) for f in os.listdir(d)])
+print([for_img(d + "/" + f) for f in os.listdir(d)])
 # pd.DataFrame({'col1': ["weewwwe deere", 2], 'col2': [3, "weweewwewe ererer"]}).to_csv("t,csv")

@@ -1,5 +1,5 @@
 touching; {M:0} styka się [orientation] z {N:1}.*{M:0} graniczy z {N:1}, [orientation].
-crossing; {M:0} nachodzi [orientation] na {B:1}.
+crossing; {M:0} nachodzi [orientation] na {B:1}.*{M:0} zachodzi [orientation] na {B:1}.*{M:0} zakrywa część {D:1}, [orientation].*{M:0} przykrywa część {D:1}, [orientation].
 close; {M:0} jest blisko {D:1}, [orientation].*{M:0} jest w pobliżu {D:1}, [orientation].
 inside; wewnątrz {D:1} [orientation], znajduje się {M:0}.*W obrębie {D:1} [orientation], znajduje się {M:0}.
 near; obok {D:0} znajduje się {M:1}, [orientation].
