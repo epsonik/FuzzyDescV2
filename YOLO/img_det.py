@@ -224,7 +224,6 @@ def vbox_engine(photo_filename, photo_boxed_filename):
     # make prediction
     yhat = model.predict(image)
     # summarize the shape of the list of arrays
-    print([a.shape for a in yhat])
     # define the anchors
     anchors = [[116, 90, 156, 198, 373, 326], [30, 61, 62, 45, 59, 119], [10, 13, 16, 30, 33, 23]]
     # define the probability threshold for detected objects

@@ -284,6 +284,8 @@ def dot_or_comma(object_name, obj_list):
     if object_name == list(obj_list.keys())[-1]:
         return "."
     else:
+        if object_name == list(obj_list.keys())[-2]:
+            return " i "
         return ", "
 
 
