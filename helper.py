@@ -3,6 +3,7 @@ import os
 import re
 from collections import Counter
 from operator import attrgetter
+import random
 
 import pandas as pd
 
@@ -202,7 +203,7 @@ def load_lang_data_pl():
     frameworks_location = dict(zip(frameworks_location[:, 0], frameworks_location[:, 1:]))
 
     data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/orientation.csv")
-    frameworks_orientation = pd.read_csv(data_path, delimiter=', ', engine='python', header=None).values
+    frameworks_orientation = pd.read_csv(data_path, delimiter='; ', engine='python', header=None).values
     frameworks_orientation = dict(zip(frameworks_orientation[:, 0], frameworks_orientation[:, 1:]))
 
     data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/yolov3_LM.csv")
@@ -328,8 +329,8 @@ def verbalize_pred_pl(pred, scene, fuzzy, boxes):
         first_obj_name = scene.onames[scene.obj[int(curr_pred[0]), 1]]
         second_obj_name = scene.onames[scene.obj[int(curr_pred[2]), 1]]
 
-        framework_location = frameworks_location[location_name_curr][0]
-        framework_orientation = frameworks_orientation[orientation_name_curr][0]
+        framework_location = random_framework(frameworks_location[location_name_curr][0])
+        framework_orientation = random_framework(frameworks_orientation[orientation_name_curr][0])
         sentence = create_replacement(framework_location, framework_orientation, data_multilingual_obj_names,
                                       [first_obj_name, second_obj_name], boxes,
                                       [int(curr_pred[0]), int(curr_pred[2])])
@@ -337,6 +338,10 @@ def verbalize_pred_pl(pred, scene, fuzzy, boxes):
         txt = txt.__add__(sentence)
         txt = txt.__add__("\n")
     return txt
+
+
+def random_framework(framework):
+    return random.choice(framework.split("*"))
 
 
 def count_ids(pred, scene):

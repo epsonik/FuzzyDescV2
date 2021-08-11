@@ -1,33 +1,33 @@
-ENG, M
-longer, dłuższy
-far below, daleko niżej
-far right, daleko z prawej
-near right, obok z prawej
-near below, obok niżej
-close right, blisko z prawej
-close below, blisko niżej
-edge below, brzeg na dole
-edge right, brzeg z prawej
-inside below, wewnątrz na dole
-inside right, wewnątrz z prawej
-inside above, wewnątrz powyżej
-inside left, wewnątrz z lewej
-edge above, brzeg powyżej
-edge left, brzeg z lewej
-close left, blisko z lewej
-close above, blisko wyżej
-near above, obok wyżej
-near left, obok z lewej
-far above, daleko powyżej
-far left, daleko po lewej
-above, od góry
-left-above, w lewym górnym rogu
-left, po lewej
-horizontal, poziomo
-vertical, pionowo
-centered, na środku
-left-below, w lewym dolnym rogu
-below, od dołu
-right-below, w prawym dolnym rogu
-right, po prawej
-right-above, w prawym górnym rogu
+ENG; M
+longer; dłuższy
+far below; daleko niżej
+far right; daleko z prawej
+near right; obok z prawej
+near below; obok niżej
+close right; blisko z prawej
+close below; blisko niżej
+edge below; brzeg na dole
+edge right; brzeg z prawej
+inside below; wewnątrz na dole
+inside right; wewnątrz z prawej
+inside above; wewnątrz powyżej
+inside left; wewnątrz z lewej
+edge above; brzeg powyżej
+edge left; brzeg z lewej
+close left; blisko z lewej
+close above; blisko wyżej
+near above; obok wyżej
+near left; obok z lewej
+far above; daleko powyżej
+far left; daleko po lewej
+above; na górze u góry
+left-above; na górze, po lewej*na górze, z lewej strony
+left; po lewej*z lewej
+horizontal; poziomo
+vertical; pionowo
+centered; na środku
+left-below; na dole, po lewej* na dole, z lewej strony
+below; na dole*u dołu
+right-below; na dole, po prawej*na dole z prawej strony
+right; po prawej*z prawej
+right-above; na górze, po prawej* na górze, z lewej

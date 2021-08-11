@@ -1,7 +1,7 @@
-touching; {M:0} styka się z {N:1}, [orientation].
-crossing; {M:0} nachodzi na {B:1}, [orientation].
-close; {M:0} jest blisko {D:1}, [orientation].
-inside; wewnątrz {D:1} [orientation], znajduje się {M:0}.
+touching; {M:0} styka się [orientation] z {N:1}.*{M:0} graniczy z {N:1}, [orientation].
+crossing; {M:0} nachodzi [orientation] na {B:1}.
+close; {M:0} jest blisko {D:1}, [orientation].*{M:0} jest w pobliżu {D:1}, [orientation].
+inside; wewnątrz {D:1} [orientation], znajduje się {M:0}.*W obrębie {D:1} [orientation], znajduje się {M:0}.
 near; obok {D:0} znajduje się {M:1}, [orientation].
 far; daleko od {D:0} jest {M:1}, [orientation].
 larger; {M:0} jest większy od {D:1}, [orientation].

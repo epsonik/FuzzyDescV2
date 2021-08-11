@@ -1,5 +1,6 @@
 import copy
 import os
+import pandas as pd
 from collections import Counter
 
 from Scene import Scene
@@ -51,7 +52,7 @@ def for_img(input_filename):
     print(verbalize_pred_pl(pred_sort, gtruth, fuzzy, boxes))
     # print(verbalize_pred_eng(pred_sort, gtruth, fuzzy, v_labels_sequential))
 
-    # draw_boxes(input_filename, photo_boxed_filename, gtruth.obj, v_labels_sequential, boxes)
+    draw_boxes(input_filename, photo_boxed_filename, gtruth.obj, v_labels_sequential, boxes)
 
 
 # process_for_grouping()
@@ -61,4 +62,4 @@ def for_img(input_filename):
 # Prints in the console the variable as requested
 d = './images'
 print([for_img(d+"/"+f) for f in os.listdir(d)])
-# for_img("./images/3.jpg")
+# pd.DataFrame({'col1': ["weewwwe deere", 2], 'col2': [3, "weweewwewe ererer"]}).to_csv("t,csv")
