@@ -12,7 +12,7 @@ def test_data():
              [1, 1, 1],
              [1, 1, 1], [1, 1, 1], [1, 1, 1]]
     onames = ['scene', 'tv', 'book', 'bed', 'potted plant', 'laptop', 'refrigerator', 'chair', 'microwave']
-    image = Image.open('images/6813627120_a222bcba0d_z.jpg')
+    image = Image.open('pl/6813627120_a222bcba0d_z.jpg')
     obj_org = np.array([[0, 0, 10, 10, 640, 480],
                           [1, 1, 131, 203, 150, 111],
                           [2, 2, 0, 124, 135, 307],

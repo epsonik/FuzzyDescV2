@@ -227,13 +227,15 @@ def load_numerical_data_pl():
 
 
 def load_numerical_data_lm_pl():
-
     data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/main_numerals/liczebniki_NMO.csv")
     numerical_NMO = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
 
     data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/main_numerals/liczebniki_Z.csv")
     numerical_Z = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
-    numerical = {'NM': numerical_NMO, 'Z': numerical_Z}
+
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pl/main_numerals/liczebniki_ZBIOROWE.csv")
+    numerical_ZB = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
+    numerical = {'NM': numerical_NMO, 'Z': numerical_Z, 'ZB': numerical_ZB}
     return numerical
 
 
@@ -258,34 +260,40 @@ def generate_preambule(data_multilingual_obj_names, data_multilingual_obj_names_
         number_of_obj_for_label = len(boxes[object_name])
         if object_name is not "scene":
             if len(boxes[object_name]) > 1:
-                def create_replacement_lm(number_of_obj_for_label):
-                    regex = r'\{(.*?)\}'
-                    obj_places = re.findall(regex, framework)
-                    sentence = copy.copy(framework)
-                    for a_string in obj_places:
-                        object_case_name = a_string
-                        object_row = get_row(data_multilingual_obj_names_lm, object_name)
-                        numerical = load_numerical_data_lm_pl()
-                        verbal_name = get_verb_numerical(number_of_obj_for_label, object_row,
-                                                                   object_case_name, numerical)
-                        s = "{" + a_string + "}"
-                        if verbal_name is not '':
-                            sentence = sentence.replace(s,
-                                                        "{} {}".format(verbal_name,
-                                                                       object_row[object_case_name]))
-                        sentence = sentence.replace(s, object_row[object_case_name])
-                    return sentence
-
-                sentence = create_replacement_lm(number_of_obj_for_label)
+                sentence = create_replacement_lm(data_multilingual_obj_names_lm, object_name, framework,
+                                                 number_of_obj_for_label)
                 preambule = preambule.__add__(sentence)
             else:
                 preambule = preambule.__add__(
                     "{B}".format_map(get_row(data_multilingual_obj_names, object_name)))
-            if object_name == list(boxes.keys())[-1]:
-                preambule = preambule.__add__(".")
-            else:
-                preambule = preambule.__add__(", ")
+            preambule = preambule.__add__(dot_or_comma(object_name, boxes))
     return preambule.capitalize()
+
+
+def dot_or_comma(object_name, obj_list):
+    if object_name == list(obj_list.keys())[-1]:
+        return "."
+    else:
+        return ", "
+
+
+def create_replacement_lm(data_multilingual_obj_names_lm, object_name, framework, number_of_obj_for_label):
+    regex = r'\{(.*?)\}'
+    obj_places = re.findall(regex, framework)
+    sentence = copy.copy(framework)
+    for a_string in obj_places:
+        object_case_name = a_string
+        object_row = get_row(data_multilingual_obj_names_lm, object_name)
+        numerical = load_numerical_data_lm_pl()
+        verbal_name = get_verb_numerical(number_of_obj_for_label, object_row,
+                                         object_case_name, numerical)
+        s = "{" + a_string + "}"
+        if verbal_name is not '':
+            sentence = sentence.replace(s,
+                                        "{} {}".format(verbal_name,
+                                                       object_row[object_case_name]))
+        sentence = sentence.replace(s, object_row[object_case_name])
+    return sentence
 
 
 def verbalize_pred_pl(pred, scene, fuzzy, boxes):
