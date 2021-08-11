@@ -51,7 +51,7 @@ def for_img(input_filename):
     print(verbalize_pred_pl(pred_sort, gtruth, fuzzy, boxes))
     # print(verbalize_pred_eng(pred_sort, gtruth, fuzzy, v_labels_sequential))
 
-    draw_boxes(input_filename, photo_boxed_filename, gtruth.obj, v_labels_sequential, boxes)
+    # draw_boxes(input_filename, photo_boxed_filename, gtruth.obj, v_labels_sequential, boxes)
 
 
 # process_for_grouping()

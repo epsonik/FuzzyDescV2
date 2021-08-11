@@ -254,20 +254,30 @@ def load_lang_data_eng():
 
 
 def generate_preambule(data_multilingual_obj_names, data_multilingual_obj_names_lm, boxes):
-    preambule = 'Na obrazie widzimy '
-    framework = " {B}"
-    for object_name in boxes.keys():
-        number_of_obj_for_label = len(boxes[object_name])
-        if object_name is not "scene":
-            if len(boxes[object_name]) > 1:
-                sentence = create_replacement_lm(data_multilingual_obj_names_lm, object_name, framework,
-                                                 number_of_obj_for_label)
-                preambule = preambule.__add__(sentence)
-            else:
-                preambule = preambule.__add__(
-                    "{B}".format_map(get_row(data_multilingual_obj_names, object_name)))
-            preambule = preambule.__add__(dot_or_comma(object_name, boxes))
-    return preambule.capitalize()
+    preambule = ""
+    preambule_single = 'Na obrazie widzimy '
+
+    framework = "{B}"
+    many = dict(filter(lambda elem: len(elem[1]) > 1 and elem[0] is not "scene", boxes.items()))
+    single = dict(filter(lambda elem: len(elem[1]) <= 1 and elem[0] is not "scene", boxes.items()))
+    for object_name in single.keys():
+        preambule_single = preambule_single.__add__(
+            framework.format_map(get_row(data_multilingual_obj_names, object_name)))
+
+        preambule_single = preambule_single.__add__(dot_or_comma(object_name, single))
+    preambule_single = preambule_single.capitalize()
+    preambule = preambule.__add__(preambule_single)
+    if len(many.keys()) >= 1:
+        preambule_many = ' Widać na nim także '
+        for object_name in many.keys():
+            number_of_obj_for_label = len(boxes[object_name])
+            sentence = create_replacement_lm(data_multilingual_obj_names_lm, object_name, framework,
+                                             number_of_obj_for_label)
+            preambule_many = preambule_many.__add__(sentence)
+            preambule_many = preambule_many.__add__(dot_or_comma(object_name, many))
+        preambule = preambule.__add__(preambule_many)
+
+    return preambule
 
 
 def dot_or_comma(object_name, obj_list):
