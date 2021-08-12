@@ -62,6 +62,6 @@ def for_img(input_filename):
 
 
 # Prints in the console the variable as requested
-d = './images'
-print([for_img(d + "/" + f) for f in os.listdir(d)])
-# pd.DataFrame({'col1': ["weewwwe deere", 2], 'col2': [3, "weweewwewe ererer"]}).to_csv("t,csv")
+# d = './images'
+# print([for_img(d + "/" + f) for f in os.listdir(d)])
+print(for_img("./images/street.jpg"))

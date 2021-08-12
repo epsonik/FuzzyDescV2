@@ -20,14 +20,14 @@ near above; bear above
 near left; near left
 far above; far above
 far left; far left
-above; above
-left-above; above on the left
+above; above*top
+left-above; on the top left
 left; on the left
 horizontal; horizontal
 vertical; vertical
 centered; in the center
-left-below; below on the left
-below; below
-right-below; below on the right
+left-below; on the bottom left
+below; below*on the bottom
+right-below; on the bottom right
 right; on the right
-right-above; above on the right
+right-above; on the top right
