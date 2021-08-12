@@ -1,7 +1,7 @@
-touching; {0} is touching {1} [orientation] *{0} graniczy z {1}, [orientation].
-crossing; {0} is crossing with {1} [orientation].*{0} intersects with {1} [orientation].
-close; {0} is close to the {1}, [orientation].*{0} is neighboring with {1}, [orientation].
-inside; {0} is inside {1} [orientation]*Inside{1} is {0} [orientation].
+touching; {0} is touching {1} [orientation] *{0} border with {1}, [orientation].
+crossing; {0} is crossing [orientation] with {1}.*{0} intersects [orientation] with {1}.
+close; {0} is close to the {1}, [orientation].*{0} is neighboring [orientation] with {1}.*{0} is next to  the {1}, [orientation].
+inside; {0} is inside [orientation] {1}*Inside {1} [orientation] is {0}.
 near; Near {0} is {1}, [orientation].
 far; Far away from {0} is {1}, [orientation].
 larger; {0} is larger than {1}, [orientation].
