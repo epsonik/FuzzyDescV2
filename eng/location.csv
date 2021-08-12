@@ -1,9 +1,9 @@
-inside, wewnątrz
-crossing, przecina
-touching, dotyka
-close, blisko
-near, obok
-far, daleko
-larger, większy
-split, dzieli naklada
-same, taki sam
+touching; {0} is touching {1} [orientation] *{0} graniczy z {1}, [orientation].
+crossing; {0} is crossing with {1} [orientation].*{0} intersects with {1} [orientation].
+close; {0} is close to the {1}, [orientation].*{0} is neighboring with {1}, [orientation].
+inside; {0} is inside {1} [orientation]*Inside{1} is {0} [orientation].
+near; Near {0} is {1}, [orientation].
+far; Far away from {0} is {1}, [orientation].
+larger; {0} is larger than {1}, [orientation].
+split; {0} splits {1}, [orientation].
+same; {0} is the same size as {1}, [orientation].

@@ -1,32 +1,33 @@
-longer, dłuższy
-far below, daleko niżej
-far right, daleko z prawej
-near right, obok z prawej
-near below, obok niżej
-close right, blisko z prawej
-close below, blisko niżej
-edge below, brzeg na dole
-edge right, brzeg z prawej
-inside below, wewnątrz na dole
-inside right, wewnątrz z prawej
-inside above, wewnątrz powyżej
-inside left, wewnątrz z lewej
-edge above, brzeg powyżej
-edge left, brzeg z lewej
-close left, blisko z lewej
-close above, blisko wyżej
-near above, obok wyżej
-near left, obok z lewej
-far above, daleko powyżej
-far left, daleko po lewej
-left-above, on the left upper corner
-left, on the left
-horizontal, poziomo
-vertical, pionowo
-centered, na środku
-left-below, on the left below corner
-below, below
-right-below, on the right below corner
-right, on the right
-right-above,  on the right upper corner
-above, from above
+ENG; M
+longer; is longer
+far below; far below
+far right; far right
+near right; near right
+near below; near below
+close right; close right
+close below; close below
+edge below; edge below
+edge right; edge right
+inside below; inside below
+inside right; inside right
+inside above; inside below
+inside left; inside left
+edge above; inside above
+edge left; inside left
+close left; close left
+close above; close above
+near above; bear above
+near left; near left
+far above; far above
+far left; far left
+above; above
+left-above; on the left above
+left; on the left
+horizontal; horizontal
+vertical; vertical
+centered; in the center
+left-below; on the left below
+below; below
+right-below; on the right below
+right;on the right
+right-above; on the right above

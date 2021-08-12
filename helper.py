@@ -16,7 +16,6 @@ import pandas as pd
 #  kolumny - obiekty dla których określamy położenie
 from YOLO.img_det import Box
 from data import *
-from eng.szablony_eng import *
 
 PL = 1
 EN = 0

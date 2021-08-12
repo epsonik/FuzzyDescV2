@@ -10,6 +10,7 @@ from itertools import repeat
 from YOLO.img_det import vbox_engine, draw_boxes, return_coordinates
 import numpy as np
 
+from eng.helper_eng import verbalize_pred_eng
 from helper import generate_description, count_ids
 from pl.helper_pl import verbalize_pred_pl
 from t import test_data
@@ -50,10 +51,10 @@ def for_img(input_filename):
     # gtruth, v_labels_sequential = test_data()
     pred_sort, gtruth, fuzzy = generate_description(gtruth)
     boxes = count_ids(pred_sort, gtruth)
-    print(verbalize_pred_pl(pred_sort, gtruth, fuzzy, boxes))
-    # print(verbalize_pred_eng(pred_sort, gtruth, fuzzy, v_labels_sequential))
+    # print(verbalize_pred_pl(pred_sort, gtruth, fuzzy, boxes))
+    print(verbalize_pred_eng(pred_sort, gtruth, fuzzy, boxes))
 
-    draw_boxes(input_filename, photo_boxed_filename, gtruth.obj, v_labels_sequential, boxes)
+    # draw_boxes(input_filename, photo_boxed_filename, gtruth.obj, v_labels_sequential, boxes)
 
 
 # process_for_grouping()

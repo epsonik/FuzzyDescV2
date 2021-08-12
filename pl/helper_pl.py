@@ -49,7 +49,7 @@ def load_numerical_data_lm_pl():
     return numerical
 
 
-def generate_preambule_pl(data_multilingual_obj_names, data_multilingual_obj_names_lm, boxes):
+def generate_preambule(data_multilingual_obj_names, data_multilingual_obj_names_lm, boxes):
     preambule = ""
     preambule_single = 'Na obrazie widzimy '
 
@@ -102,7 +102,7 @@ def verbalize_pred_pl(pred, scene, fuzzy, boxes):
     data_multilingual_obj_names, \
     data_multilingual_obj_names_lm = load_lang_data_pl()
 
-    preambule = generate_preambule_pl(data_multilingual_obj_names, data_multilingual_obj_names_lm, boxes)
+    preambule = generate_preambule(data_multilingual_obj_names, data_multilingual_obj_names_lm, boxes)
     txt = txt.__add__(preambule)
     txt = txt.__add__("\n")
     for i in range(len(pred)):
