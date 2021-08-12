@@ -32,24 +32,24 @@ def verbalize_pred_eng(pred, scene, fuzzy, boxes):
     preambule = generate_preambule(data_multilingual_obj_names, data_multilingual_obj_names_lm, boxes)
     txt = txt.__add__(preambule)
     txt = txt.__add__("\n")
-    # for i in range(len(pred)):
-    #     curr_pred = pred[i, :]
-    #     ty = int(curr_pred[4])
-    #     location_name_curr = fuzzy.lev3.tname[ty]
-    #
-    #     o = int(curr_pred[6])
-    #     orientation_name_curr = fuzzy.lev3.oname[o]
-    #     first_obj_name = scene.onames[scene.obj[int(curr_pred[0]), 1]]
-    #     second_obj_name = scene.onames[scene.obj[int(curr_pred[2]), 1]]
-    #
-    #     framework_location = random_framework(frameworks_location[location_name_curr][0])
-    #     framework_orientation = random_framework(frameworks_orientation[orientation_name_curr][0])
-    #     sentence = create_replacement(framework_location, framework_orientation, data_multilingual_obj_names,
-    #                                   [first_obj_name, second_obj_name], boxes,
-    #                                   [int(curr_pred[0]), int(curr_pred[2])])
-    #     sentence = sentence.capitalize()
-    #     txt = txt.__add__(sentence)
-    #     txt = txt.__add__("\n")
+    for i in range(len(pred)):
+        curr_pred = pred[i, :]
+        ty = int(curr_pred[4])
+        location_name_curr = fuzzy.lev3.tname[ty]
+
+        o = int(curr_pred[6])
+        orientation_name_curr = fuzzy.lev3.oname[o]
+        first_obj_name = scene.onames[scene.obj[int(curr_pred[0]), 1]]
+        second_obj_name = scene.onames[scene.obj[int(curr_pred[2]), 1]]
+
+        framework_location = random_framework(frameworks_location[location_name_curr][0])
+        framework_orientation = random_framework(frameworks_orientation[orientation_name_curr][0])
+        sentence = create_replacement(framework_location, framework_orientation, data_multilingual_obj_names,
+                                      [first_obj_name, second_obj_name], boxes,
+                                      [int(curr_pred[0]), int(curr_pred[2])])
+        sentence = sentence.capitalize()
+        txt = txt.__add__(sentence)
+        txt = txt.__add__("\n")
     return txt
 
 
@@ -78,30 +78,28 @@ def generate_preambule(data_multilingual_obj_names, data_multilingual_obj_names_
     return preambule
 
 
-# def create_replacement(framework_location, framework_orientation, data_object, resolved_obj_names_array, boxes,
-#                        resolved_obj_places_array):
-#     regex_location = r'\{(.*?)\}'
-#
-#     obj_places_location = re.findall(regex_location, framework_location)
-#     sentence = copy.copy(framework_location)
-#     for a_string in obj_places_location:
-#         result = a_string.split(":")
-#         object_case_name = result[0]
-#         object_place = int(result[1])
-#         sequence_id = get_seq_id(resolved_obj_names_array[object_place], resolved_obj_places_array[object_place], boxes)
-#         object_row = get_row(data_object, resolved_obj_names_array[object_place])
-#         numerical = load_numerical_data_eng()
-#         sequence_id_verb_name = get_verb_numerical(sequence_id, object_row, object_case_name, numerical)
-#         s = "{" + a_string + "}"
-#         if sequence_id_verb_name is not '':
-#             sentence = sentence.replace(s, "{} {}".format(sequence_id_verb_name, object_row[object_case_name]))
-#         sentence = sentence.replace(s, object_row[object_case_name])
-#
-#     regex_orientation = r'\[(.*?)\]'
-#     obj_places_orientation = re.findall(regex_orientation, framework_location)
-#     s = "[" + obj_places_orientation[0] + "]"
-#     sentence = sentence.replace(s, framework_orientation)
-#     return sentence
+def create_replacement(framework_location, framework_orientation, data_object, resolved_obj_names_array, boxes,
+                       resolved_obj_places_array):
+    regex_location = r'\{(.*?)\}'
+
+    obj_places_location = re.findall(regex_location, framework_location)
+    sentence = copy.copy(framework_location)
+    for a_string in obj_places_location:
+        result = a_string.split(":")
+        object_place = int(result[0])
+        sequence_id = get_seq_id(resolved_obj_names_array[object_place], resolved_obj_places_array[object_place], boxes)
+        numerical = load_numerical_data()
+        sequence_id_verb_name = get_verb_numerical(sequence_id, numerical)
+        s = "{" + a_string + "}"
+        if sequence_id_verb_name is not '':
+            sentence = sentence.replace(s, "{} {}".format(sequence_id_verb_name, resolved_obj_names_array[object_place]))
+        sentence = sentence.replace(s, resolved_obj_names_array[object_place])
+
+    regex_orientation = r'\[(.*?)\]'
+    obj_places_orientation = re.findall(regex_orientation, framework_location)
+    s = "[" + obj_places_orientation[0] + "]"
+    sentence = sentence.replace(s, framework_orientation)
+    return sentence
 
 
 def create_replacement_lm(data_multilingual_obj_names_lm, object_name, framework, number_of_obj_for_label):
@@ -112,7 +110,7 @@ def create_replacement_lm(data_multilingual_obj_names_lm, object_name, framework
         object_case_name = 'LM'
         object_row = get_row(data_multilingual_obj_names_lm, object_name)
         numerical = load_numerical_data_lm()
-        verbal_name = get_verb_numerical(number_of_obj_for_label, numerical)
+        verbal_name = get_verb_numerical(number_of_obj_for_label, numerical, col='VERB')
         s = "{" + a_string + "}"
         if verbal_name is not '':
             sentence = sentence.replace(s,
@@ -137,14 +135,16 @@ def load_numerical_data_lm():
 # object_case_name - case of noun
 # row from data file, with noun, kind of noun and cases of it
 # number of occurences of obj on image
-def get_verb_numerical(sequence_id, numerical):
+def get_verb_numerical(sequence_id, numerical, col='VERB_SEQ'):
     if sequence_id is not None:
         # femine, man, neuter rodzaj rzeczownika
         numerical_row = get_row(numerical, sequence_id, 'LP')
-        numerical_verbal = numerical_row['VERB']
+        numerical_verbal = numerical_row[col]
         return numerical_verbal
     else:
         return ""
+
+
 def dot_or_comma(object_name, obj_list):
     if object_name == list(obj_list.keys())[-1]:
         return "."
