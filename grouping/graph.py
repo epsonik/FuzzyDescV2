@@ -56,4 +56,4 @@ def generate_groups(intersection_mtx):
     k = set()
     for idx, _ in enumerate(intersection_mtx):
         k.add(g.DFS(idx))
-    return [list(x) for x in k if len(list(x)) > 2]
+    return [list(x) for x in k if len(list(x)) >= 2]

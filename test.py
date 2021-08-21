@@ -1,7 +1,5 @@
 import copy
 import os
-import pandas as pd
-from collections import Counter
 
 from Scene import Scene
 from PIL import Image
@@ -13,8 +11,7 @@ import numpy as np
 from eng.helper_eng import verbalize_pred_eng
 from grouping.graph import generate_groups
 from helper import generate_description, count_ids, verbalize_pred
-from pl.helper_pl import verbalize_pred_pl
-from t import test_data
+from texts import *
 from operator import attrgetter
 
 
@@ -49,7 +46,8 @@ def from_pic(input_filename):
 def generate_inter_matrix(b_boxes, pred):
     key_id = attrgetter("id")
     ids = [key_id(box) for box in b_boxes]
-    df = pred[np.in1d(pred[:, 0], ids) & np.in1d(pred[:, 2], ids)]
+    allowed_location_names = [0, 1, 2, 3, 4, 5, 7]
+    df = pred[np.in1d(pred[:, 0], ids) & np.in1d(pred[:, 2], ids) & np.in1d(pred[:, 4], allowed_location_names)]
     mx = np.amax(ids)
     intersection_mtx = np.zeros((mx + 1, mx + 1))
     for row in df:
@@ -78,7 +76,7 @@ def for_img(input_filename):
     boxes = count_ids(pred_sort, gtruth)
     print(grouping(boxes, pred_sort))
     # print(verbalize_pred_pl(pred_sort, gtruth, fuzzy, boxes))
-    # print(verbalize_pred_eng(pred_sort, gtruth, fuzzy, boxes))
+    print(verbalize_pred_eng(pred_sort, gtruth, fuzzy, boxes))
     print(verbalize_pred(pred_sort, gtruth, fuzzy, boxes))
 
     draw_boxes(input_filename, photo_boxed_filename, gtruth.obj, v_labels_sequential, boxes)
