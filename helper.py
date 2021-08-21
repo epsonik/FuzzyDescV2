@@ -127,7 +127,11 @@ def get_predicates(fmpm_mat, scene, fuzzy):
     # liczba możliwych relacji
     ile_rel, _, ile_ob = fmpm_mat.shape
     # wektor istotności obiektów (kryterium: wielkość):
-    obj_sal = np.round(scene.obj[:, 4] * scene.obj[:, 5] / (scene.obj[0, 4] * scene.obj[0, 5]), 4)
+    obj_width = scene.obj[:, 4]
+    obj_height = scene.obj[:, 5]
+    scene_width = scene.obj[0, 4]
+    scene_height = scene.obj[0, 5]
+    obj_sal = np.round(obj_width * obj_height / (scene_width * scene_height), 4)
     # korekta istotności obrazu jako całości - ustawiamy ją sztucznie jako
     # równą średniej istotności obiektu:
     obj_sal[0] = max(obj_sal[1:])
@@ -163,8 +167,10 @@ def filter_predicates(to_sort, scene):
     obj_anchors.fill(False)
     obj_anchors[0] = True
     for i in range(len(to_sort)):
-        if (not bool(obj_anchors[int(to_sort[i, 0])][0])) & bool(obj_anchors[int(to_sort[i, 2])][0]):
-            obj_anchors[int(to_sort[i, 0])] = True
+        first_object = int(to_sort[i, 0])
+        second_object = int(to_sort[i, 2])
+        if (not bool(obj_anchors[first_object][0])) & bool(obj_anchors[second_object][0]):
+            obj_anchors[first_object] = True
             c = np.append(to_sort[i, :], to_sort[i, 1])
             pred_out.append(c)
     return np.array(pred_out)
@@ -176,20 +182,17 @@ def verbalize_pred(pred, scene, fuzzy, boxes):
 
     for i in range(len(pred)):
         curr_pred = pred[i, :]
-        ty = int(curr_pred[4])
-        tname_curr = fuzzy.lev3.tname[ty]
-
-        o = int(curr_pred[6])
-        oname_curr = fuzzy.lev3.oname[o]
+        location_number = int(curr_pred[4])
+        location_name_curr = fuzzy.lev3.tname[location_number]
+        orientation_number = int(curr_pred[6])
+        orientation_name_curr = fuzzy.lev3.oname[orientation_number]
         first_obj_name = scene.onames[scene.obj[int(curr_pred[0]), 1]]
         second_obj_name = scene.onames[scene.obj[int(curr_pred[2]), 1]]
-        obj_id_from_predicate = pred[i, 0] - zerolab
-        sequence_id = get_seq_id(first_obj_name, obj_id_from_predicate, boxes)
+        obj_id_from_predicate = pred[i, 0]
         txt = txt.__add__(
-            "{} {} object {} {} : {} {} rel. to {} {} ({})\n".format(sequence_id, i,
-                                                                     obj_id_from_predicate,
+            "object {} {} : {} {} rel. to {} {} ({})\n".format(obj_id_from_predicate,
                                                                      first_obj_name,
-                                                                     tname_curr, oname_curr,
+                                                                     location_name_curr, orientation_name_curr,
                                                                      pred[i, 2] - zerolab,
                                                                      second_obj_name,
                                                                      curr_pred[8]))

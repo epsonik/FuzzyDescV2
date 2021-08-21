@@ -107,8 +107,8 @@ def verbalize_pred_pl(pred, scene, fuzzy, boxes):
     txt = txt.__add__("\n")
     for i in range(len(pred)):
         curr_pred = pred[i, :]
-        ty = int(curr_pred[4])
-        location_name_curr = fuzzy.lev3.tname[ty]
+        l = int(curr_pred[4])
+        location_name_curr = fuzzy.lev3.tname[l]
 
         o = int(curr_pred[6])
         orientation_name_curr = fuzzy.lev3.oname[o]
