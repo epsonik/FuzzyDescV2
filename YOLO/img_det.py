@@ -135,23 +135,25 @@ def get_boxes(boxes, thresh):
         for i in range(len(labels)):
             # check if the threshold for this label is high enough
             if box.classes[i] > thresh:
-                v_boxes.append(box)
+                box.label = labels[i]
+                box.label_id = len(v_labels) + 1
                 v_labels.append(labels[i])
+                v_boxes.append(box)
                 v_scores.append(box.classes[i] * 100)
             # don't break, many labels may trigger for one box
     return v_boxes, v_labels, v_scores
 
 
 class Box:
-    def __init__(self, box, label, seq_id, id):
+    def __init__(self, box, label, seq_id, id, is_group=False):
         self.box = box
         self.label = label
         self.seq_id = seq_id
         self.id = id
+        self.is_group = is_group
 
 
 def return_coordinates(v_boxes, v_labels, image_w, image_h):
-    boxes = dict()
     v_boxes_matlab = []
     obj_number = 1
     b = [0, 0, 10, 10, image_w, image_h]

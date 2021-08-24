@@ -191,11 +191,11 @@ def verbalize_pred(pred, scene, fuzzy, boxes):
         obj_id_from_predicate = pred[i, 0]
         txt = txt.__add__(
             "object {} {} : {} {} rel. to {} {} ({})\n".format(obj_id_from_predicate,
-                                                                     first_obj_name,
-                                                                     location_name_curr, orientation_name_curr,
-                                                                     pred[i, 2] - zerolab,
-                                                                     second_obj_name,
-                                                                     curr_pred[8]))
+                                                               first_obj_name,
+                                                               location_name_curr, orientation_name_curr,
+                                                               pred[i, 2] - zerolab,
+                                                               second_obj_name,
+                                                               curr_pred[8]))
     return txt
 
 
@@ -212,7 +212,29 @@ def random_framework(framework):
     return random.choice(framework.split("*"))
 
 
-def count_ids(pred, scene):
+def count_ids(pred, scene, v_boxes):
+    boxes2 = dict()
+
+    for i in range(len(pred)):
+        curr_pred = pred[i, :]
+        first_obj_name = scene.onames[scene.obj[int(curr_pred[0]), 1]]
+        second_obj_name = scene.onames[scene.obj[int(curr_pred[2]), 1]]
+
+        def check_labels(object_name, obj_number):
+            if object_name not in boxes2:
+                boxes2[object_name] = [Box(v_boxes[obj_number - 1], object_name, 1, obj_number)]
+            else:
+                key_id = attrgetter("id")
+                if not any(key_id(i) == obj_number for i in boxes2[object_name]):
+                    boxes2[object_name].append(
+                        Box(v_boxes[obj_number - 1], object_name, len(boxes2[object_name]) + 1, obj_number))
+
+        check_labels(first_obj_name, int(curr_pred[0]))
+        check_labels(second_obj_name, int(curr_pred[2]))
+    return boxes2
+
+
+def count_ids_g(pred, scene, v_boxes):
     boxes2 = dict()
 
     for i in range(len(pred)):
@@ -226,7 +248,8 @@ def count_ids(pred, scene):
             else:
                 key_id = attrgetter("id")
                 if not any(key_id(i) == obj_number for i in boxes2[object_name]):
-                    boxes2[object_name].append(Box(None, object_name, len(boxes2[object_name]) + 1, obj_number))
+                    boxes2[object_name].append(
+                        Box(None, object_name, len(boxes2[object_name]) + 1, obj_number))
 
         check_labels(first_obj_name, int(curr_pred[0]))
         check_labels(second_obj_name, int(curr_pred[2]))

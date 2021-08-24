@@ -45,15 +45,3 @@ class Graph:
         # to print DFS traversal
         self.DFSUtil(v, visited)
         return frozenset(visited)
-
-
-def generate_groups(intersection_mtx):
-    g = Graph()
-    for row_idx, row in enumerate(intersection_mtx):
-        for col_idx, col in enumerate(row):
-            if intersection_mtx[row_idx][col_idx] != 0:
-                g.addEdge(row_idx, col_idx)
-    k = set()
-    for idx, _ in enumerate(intersection_mtx):
-        k.add(g.DFS(idx))
-    return [list(x) for x in k if len(list(x)) >= 2]
