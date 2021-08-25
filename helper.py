@@ -14,7 +14,7 @@ import pandas as pd
 #  macierz wyjsciowa:
 #  wiersze - obiekty referencyjne - względem nich określamy położenie
 #  kolumny - obiekty dla których określamy położenie
-from YOLO.img_det import Box
+
 from data import *
 
 PL = 1
@@ -213,6 +213,7 @@ def random_framework(framework):
 
 
 def count_ids(pred, scene, v_boxes):
+    from YOLO.img_det import Box
     boxes2 = dict()
 
     for i in range(len(pred)):
@@ -234,7 +235,7 @@ def count_ids(pred, scene, v_boxes):
     return boxes2
 
 
-def count_ids_g(pred, scene):
+def count_ids_g(pred, scene, v_boxes):
     boxes2 = dict()
 
     for i in range(len(pred)):
@@ -244,12 +245,15 @@ def count_ids_g(pred, scene):
 
         def check_labels(object_name, obj_number):
             if object_name not in boxes2:
-                boxes2[object_name] = [Box(None, object_name, 1, obj_number)]
+                b = v_boxes[obj_number]
+                b.seq_id = 1
+                boxes2[object_name] = [b]
             else:
                 key_id = attrgetter("id")
                 if not any(key_id(i) == obj_number for i in boxes2[object_name]):
-                    boxes2[object_name].append(
-                        Box(None, object_name, len(boxes2[object_name]) + 1, obj_number))
+                    b = v_boxes[obj_number]
+                    b.seq_id = len(boxes2[object_name]) + 1
+                    boxes2[object_name].append(b)
 
         check_labels(first_obj_name, int(curr_pred[0]))
         check_labels(second_obj_name, int(curr_pred[2]))

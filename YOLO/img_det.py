@@ -1,5 +1,6 @@
 # load yolov3 model and perform object detection
 # based on https://github.com/experiencor/keras-yolo3
+import operator
 import os
 from collections import Counter
 from operator import attrgetter
@@ -12,7 +13,11 @@ from matplotlib import pyplot
 from matplotlib.patches import Rectangle
 from numpy import expand_dims
 from faker import Factory
+from setuptools.namespaces import flatten
+import functools
 from YOLO.bound_box import BoundBox
+
+from grouping.Intersection import filtr
 
 data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "yolov3.txt")
 labels = data = [line.strip() for line in open(data_path, 'r')]
@@ -185,7 +190,7 @@ def draw_boxes(filename, filename_boxed, v_boxes, v_labels, boxes_counted):
     fake = Factory.create()
     for box_c in boxes_counted.keys():
         box_colors[box_c] = fake.hex_color()
-
+    list_of_b_boxes = functools.reduce(operator.iconcat, list(boxes_counted.values()), [])
     for box in v_boxes:
         # get coordinates
         x1, y1 = box[2], box[3]
@@ -197,8 +202,9 @@ def draw_boxes(filename, filename_boxed, v_boxes, v_labels, boxes_counted):
         # draw the box
         ax.add_patch(rect)
 
-        # draw text and score in top left corner
-        pyplot.text(x1, y1, "%d" % (box[0]), color="white")
+        # draw text and score in top left corne
+        bb = filtr([box[0]], list_of_b_boxes)[0].seq_id
+        pyplot.text(x1, y1, "%d (%s)" % (box[0], bb), color="white")
     # show the plot
     pyplot.savefig(filename_boxed)
     pyplot.show()

@@ -6,7 +6,7 @@ from pandas.core.common import flatten
 
 from Scene import Scene
 from YOLO.bound_box import BoundBox
-from YOLO.img_det import Box
+
 from grouping.graph import Graph
 import functools
 import operator
@@ -108,6 +108,7 @@ def generate_inter_matrix(ids, pred):
 
 
 def grouping_ids(boxes, pred):
+    from YOLO.img_det import Box
     new_b_boxes = list()
 
     list_of_b_boxes = functools.reduce(operator.iconcat, list(boxes.values()), [])

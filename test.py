@@ -48,18 +48,17 @@ def from_pic(input_filename):
 def for_img(input_filename):
     # gtruth, v_labels_matlab, v_labels_matlab_sequential, v_boxes, image_w, image_h = from_pic(input_filename)
     gtruth, v_labels_matlab_sequential, v_boxes, image_w, image_h = test_data()
-    # gtruth, v_labels_sequential = test_data()
     pred_sort, fuzzy = generate_description(gtruth)
     boxes_counted = count_ids(pred_sort, gtruth, v_boxes)
-    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images/grouping_test/boxes/'+input_filename)
-    draw_boxes(input_filename, data_path.replace('.jpg', '_boxed.jpg'), gtruth.obj[1:],
-               v_labels_matlab_sequential, boxes_counted)
+    # data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images/grouping_test/boxes/'+input_filename)
+    # draw_boxes(input_filename, data_path.replace('.jpg', '_boxed.jpg'), gtruth.obj[1:],
+    #            v_labels_matlab_sequential, boxes_counted)
 
     gtruth, v_labels_matlab, v_boxes_matlab, v_labels_matlab_sequential, v_boxes = grouping(boxes_counted, pred_sort,
                                                                                             gtruth)
 
     pred_sort, fuzzy = generate_description(gtruth)
-    boxes_counted = count_ids_g(pred_sort, gtruth)
+    boxes_counted = count_ids_g(pred_sort, gtruth, v_boxes)
     # print(verbalize_pred_pl(pred_sort, gtruth, fuzzy, boxes))
     print(verbalize_pred_eng(pred_sort, gtruth, fuzzy, boxes_counted))
     print(verbalize_pred(pred_sort, gtruth, fuzzy))
