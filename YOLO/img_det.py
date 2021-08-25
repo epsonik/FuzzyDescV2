@@ -11,7 +11,7 @@ from keras.preprocessing.image import load_img
 from matplotlib import pyplot
 from matplotlib.patches import Rectangle
 from numpy import expand_dims
-
+from faker import Factory
 from YOLO.bound_box import BoundBox
 
 data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "yolov3.txt")
@@ -177,7 +177,7 @@ def return_coordinates(v_boxes, v_labels, image_w, image_h):
 
 
 # draw all results
-def draw_boxes(filename, photo_boxed_filename, v_boxes, v_labels, boxes):
+def draw_boxes(filename, photo_boxed_filename, v_boxes, v_labels, boxes_counted):
     # load the image
     data = pyplot.imread(filename)
     # plot the image
@@ -185,28 +185,24 @@ def draw_boxes(filename, photo_boxed_filename, v_boxes, v_labels, boxes):
     # get the context for drawing boxes
     ax = pyplot.gca()
     # plot each box
-    b_boxes = dict
-    for i in range(1, len(v_boxes)):
-        box = v_boxes[i]
+    box_colors = dict()
+    fake = Factory.create()
+    for box_c in boxes_counted.keys():
+        box_colors[box_c] = fake.hex_color()
+
+    for box in v_boxes[1:]:
         # get coordinates
         x1, y1 = box[2], box[3]
         # calculate width and height of the box
         width, height = box[4], box[5]
         # create the shape
-        rect = Rectangle((x1, y1), width, height, fill=False, color='white')
+        label = v_labels[box[0]]
+        rect = Rectangle((x1, y1), width, height, fill=False, color=box_colors[label])
         # draw the box
         ax.add_patch(rect)
 
         # draw text and score in top left corner
-
-        def get_se(bb, i):
-            for x in bb:
-                key_id = attrgetter("id")
-                if (key_id(x) == i):
-                    return x.seq_id
-
-        label = "%s %d" % (v_labels[i], get_se(boxes[v_labels[i]], i))
-        pyplot.text(x1, y1, label, color='red')
+        pyplot.text(x1, y1, "%d" % (box[0]), color="white")
     # show the plot
     pyplot.savefig(photo_boxed_filename)
     pyplot.show()

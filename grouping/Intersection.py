@@ -11,7 +11,6 @@ from grouping.graph import Graph
 import functools
 import operator
 
-
 # def group_filter_name(names_set: set, v_boxes_temp: list):
 #     groups = {}
 #     v_boxes_new = []
@@ -55,6 +54,8 @@ import operator
 #         if intersection_over_union_val > 0:
 #             return intersection_over_union_val
 #     return intersection_over_union_val
+from helper import count_ids
+
 
 def generate_groups(intersection_mtx):
     g = Graph()
@@ -95,9 +96,7 @@ def _adj_width_height(box, n):
 #     return XtopLeft, YtopLeft, X_len, Y_len
 
 
-def generate_inter_matrix(b_boxes, pred):
-    key_id = attrgetter("id")
-    ids = [key_id(box) for box in b_boxes]
+def generate_inter_matrix(ids, pred):
     allowed_location_names = [2, 3, 4, 5, 6, 7, 8]
     df = pred[np.in1d(pred[:, 0], ids) & np.in1d(pred[:, 2], ids) & np.in1d(pred[:, 4], allowed_location_names)]
     mx = np.amax(ids)
@@ -114,8 +113,12 @@ def grouping_ids(boxes, pred):
     list_of_b_boxes = functools.reduce(operator.iconcat, list(boxes.values()), [])
     for key, value in boxes.items():
         if len(value) > 1:
-            inter_mtx = generate_inter_matrix(value, pred)
+            key_id = attrgetter("id")
+            ids = [key_id(box) for box in value]
+            inter_mtx = generate_inter_matrix(ids, pred)
             separated_groups_of_b_boxes = generate_groups(inter_mtx)
+            diff = list(set(ids) - set(flatten(separated_groups_of_b_boxes)))
+            separated_groups_of_b_boxes.append(diff)
             if separated_groups_of_b_boxes:
                 for group in separated_groups_of_b_boxes:
                     if len(group) >= 2:
@@ -129,7 +132,7 @@ def grouping_ids(boxes, pred):
         else:
             new_b_boxes.append(value)
     new_b_labels = [box.label for box in flatten(new_b_boxes)]
-    return flatten(new_b_boxes), new_b_labels
+    return list(flatten(new_b_boxes)), new_b_labels
 
 
 def filtr(group, list_of_b_boxes):
@@ -156,9 +159,9 @@ def grouping_coordinates(b_boxes_to_merge):
 
 def grouping(boxes_counted, pred, scene, image_w, image_h):
     new_b_boxes, new_b_labels = grouping_ids(boxes_counted, pred)
-    v_boxes_matlab, v_labels_matlab, v_labels_matlab_sequential, gtruth \
+    new_scene, v_labels_matlab, v_boxes_matlab, v_labels_matlab_sequential \
         = new_gtruth(new_b_boxes, scene, image_w, image_h)
-    return v_boxes_matlab, v_labels_matlab, v_labels_matlab_sequential, gtruth, new_b_boxes
+    return new_scene, v_labels_matlab, v_boxes_matlab, v_labels_matlab_sequential, new_b_boxes
 
 
 # new scene object with grouped objects
@@ -182,6 +185,7 @@ def new_gtruth(new_b_boxes, scene, image_w, image_h):
                 v_labels_matlab.append(lab)
             return v_labels_matlab.index(lab)
 
+        box.id = obj_number
         b = [obj_number, check_labels(box.label), XtopLeft, YtopLeft, width, height]
         v_boxes_matlab.append(b)
         v_labels_matlab_sequential.append(box.label)

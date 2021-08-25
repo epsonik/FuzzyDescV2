@@ -222,12 +222,12 @@ def count_ids(pred, scene, v_boxes):
 
         def check_labels(object_name, obj_number):
             if object_name not in boxes2:
-                boxes2[object_name] = [Box(v_boxes[obj_number - 1], object_name, 1, obj_number)]
+                boxes2[object_name] = [Box(v_boxes[obj_number], object_name, 1, obj_number)]
             else:
                 key_id = attrgetter("id")
                 if not any(key_id(i) == obj_number for i in boxes2[object_name]):
                     boxes2[object_name].append(
-                        Box(v_boxes[obj_number - 1], object_name, len(boxes2[object_name]) + 1, obj_number))
+                        Box(v_boxes[obj_number], object_name, len(boxes2[object_name]) + 1, obj_number))
 
         check_labels(first_obj_name, int(curr_pred[0]))
         check_labels(second_obj_name, int(curr_pred[2]))
@@ -284,4 +284,4 @@ def generate_description(gtruth):
     pred = get_predicates(fmpm_mat, gtruth, fuzzy)
     to_sort = sort_predicates(pred, [1, 5, 8, 3])
     pred_filtered = filter_predicates(to_sort, gtruth)
-    return pred_filtered, gtruth, fuzzy
+    return pred_filtered, fuzzy

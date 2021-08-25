@@ -3,7 +3,8 @@ import numpy as np
 
 class BoundBox:
 
-    def __init__(self, XtopLeft, YtopLeft, XbottomRight, YbottomRight, objness=None, classes=None):
+    def __init__(self, XtopLeft, YtopLeft, XbottomRight, YbottomRight, objness=None, classes=None, label=None,
+                 label_id=None):
         self.XtopLeft = XtopLeft
         self.YtopLeft = YtopLeft
         self.XbottomRight = XbottomRight
@@ -11,6 +12,7 @@ class BoundBox:
         self.objness = objness
         self.classes = classes
         self.label = -1
+        self.label_id = label_id
         self.score = -1
 
     def get_coordinates(self):

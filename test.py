@@ -5,12 +5,14 @@ from Scene import Scene
 from PIL import Image
 from itertools import repeat
 
+from YOLO.bound_box import BoundBox
 from YOLO.img_det import vbox_engine, draw_boxes, return_coordinates
 import numpy as np
 
 from eng.helper_eng import verbalize_pred_eng
-from grouping.Intersection import  grouping
+from grouping.Intersection import grouping
 from helper import generate_description, count_ids, verbalize_pred, count_ids_g
+from t_grouping import test_data
 
 
 def from_pic(input_filename):
@@ -19,6 +21,7 @@ def from_pic(input_filename):
     photo_boxed_filename = input_filename.replace('.jpg', '_boxed.jpg')
     v_boxes, v_labels, v_scores, image_w, image_h = vbox_engine(input_filename,
                                                                 photo_boxed_filename)
+    v_boxes.append(BoundBox(XbottomRight=640, XtopLeft=0, YbottomRight=480, YtopLeft=0, label='scene', label_id=1))
     v_boxes_matlab, v_labels_matlab, v_labels_matlab_sequential = return_coordinates(v_boxes, v_labels,
                                                                                      image_w, image_h)
 
@@ -43,14 +46,16 @@ def from_pic(input_filename):
 
 def for_img(input_filename):
     photo_boxed_filename = input_filename.replace('.jpg', '_boxed.jpg')
-    gtruth, v_labels_matlab, v_labels_sequential, v_boxes, image_w, image_h = from_pic(input_filename)
-
+    # gtruth, v_labels_matlab, v_labels_matlab_sequential, v_boxes, image_w, image_h = from_pic(input_filename)
+    gtruth, v_labels_matlab_sequential, v_boxes, image_w, image_h = test_data()
     # gtruth, v_labels_sequential = test_data()
-    pred_sort, gtruth, fuzzy = generate_description(gtruth)
+    pred_sort, fuzzy = generate_description(gtruth)
     boxes_counted = count_ids(pred_sort, gtruth, v_boxes)
+    # draw_boxes(input_filename, photo_boxed_filename, gtruth.obj, v_labels_matlab_sequential, boxes_counted)
 
-    gtruth, v_labels_matlab, v_boxes_matlab, v_labels_matlab_sequential, v_boxes = grouping(boxes_counted, pred_sort, gtruth,
-                                                                                   image_w, image_h)
+    gtruth, v_labels_matlab, v_boxes_matlab, v_labels_matlab_sequential, v_boxes = grouping(boxes_counted, pred_sort,
+                                                                                            gtruth,
+                                                                                            image_w, image_h)
 
     pred_sort, gtruth, fuzzy = generate_description(gtruth)
     boxes_counted = count_ids_g(pred_sort, gtruth, v_boxes)
@@ -58,7 +63,8 @@ def for_img(input_filename):
     # print(verbalize_pred_eng(pred_sort, gtruth, fuzzy, boxes_counted))
     print(verbalize_pred(pred_sort, gtruth, fuzzy, boxes_counted))
 
-    # draw_boxes(input_filename, photo_boxed_filename, gtruth.obj, v_labels_sequential, boxes_counted)
+    draw_boxes(input_filename, input_filename.replace('.jpg', '_boxed2.jpg'), gtruth.obj, v_labels_matlab_sequential,
+               boxes_counted)
 
 
 # process_for_grouping()
