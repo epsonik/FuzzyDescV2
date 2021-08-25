@@ -44,7 +44,7 @@ def verbalize_pred_eng(pred, scene, fuzzy, boxes):
 
         framework_location = random_framework(frameworks_location[location_name_curr][0])
         framework_orientation = random_framework(frameworks_orientation[orientation_name_curr][0])
-        sentence = create_replacement(framework_location, framework_orientation, data_multilingual_obj_names,
+        sentence = create_replacement(framework_location, framework_orientation,
                                       [first_obj_name, second_obj_name], boxes,
                                       [int(curr_pred[0]), int(curr_pred[2])])
         sentence = sentence.capitalize()
@@ -78,7 +78,7 @@ def generate_preambule(data_multilingual_obj_names, data_multilingual_obj_names_
     return preambule
 
 
-def create_replacement(framework_location, framework_orientation, data_object, resolved_obj_names_array, boxes,
+def create_replacement(framework_location, framework_orientation, resolved_obj_names_array, boxes,
                        resolved_obj_places_array):
     regex_location = r'\{(.*?)\}'
 

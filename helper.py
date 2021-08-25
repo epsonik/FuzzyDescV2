@@ -176,7 +176,7 @@ def filter_predicates(to_sort, scene):
     return np.array(pred_out)
 
 
-def verbalize_pred(pred, scene, fuzzy, boxes):
+def verbalize_pred(pred, scene, fuzzy):
     zerolab = 1
     txt = ""
 
@@ -234,7 +234,7 @@ def count_ids(pred, scene, v_boxes):
     return boxes2
 
 
-def count_ids_g(pred, scene, v_boxes):
+def count_ids_g(pred, scene):
     boxes2 = dict()
 
     for i in range(len(pred)):

@@ -111,26 +111,28 @@ def grouping_ids(boxes, pred):
     new_b_boxes = list()
 
     list_of_b_boxes = functools.reduce(operator.iconcat, list(boxes.values()), [])
+    new_b_boxes.append(boxes['scene'])
     for key, value in boxes.items():
-        if len(value) > 1:
-            key_id = attrgetter("id")
-            ids = [key_id(box) for box in value]
-            inter_mtx = generate_inter_matrix(ids, pred)
-            separated_groups_of_b_boxes = generate_groups(inter_mtx)
-            diff = list(set(ids) - set(flatten(separated_groups_of_b_boxes)))
-            separated_groups_of_b_boxes.append(diff)
-            if separated_groups_of_b_boxes:
-                for group in separated_groups_of_b_boxes:
-                    if len(group) >= 2:
-                        XtopLeft, YtopLeft, XbottomRight, YbottomRight = grouping_coordinates(
-                            filtr(group, list_of_b_boxes))
-                        box = Box(BoundBox(XtopLeft, YtopLeft, XbottomRight, YbottomRight), key, None, None,
-                                  is_group=True)
-                        new_b_boxes.append(box)
-                    else:
-                        new_b_boxes.append(filtr(group, list_of_b_boxes))
-        else:
-            new_b_boxes.append(value)
+        if key is not 'scene':
+            if len(value) > 1:
+                key_id = attrgetter("id")
+                ids = [key_id(box) for box in value]
+                inter_mtx = generate_inter_matrix(ids, pred)
+                separated_groups_of_b_boxes = generate_groups(inter_mtx)
+                diff = list(set(ids) - set(flatten(separated_groups_of_b_boxes)))
+                separated_groups_of_b_boxes.append(diff)
+                if separated_groups_of_b_boxes:
+                    for group in separated_groups_of_b_boxes:
+                        if len(group) >= 2:
+                            XtopLeft, YtopLeft, XbottomRight, YbottomRight = grouping_coordinates(
+                                filtr(group, list_of_b_boxes))
+                            box = Box(BoundBox(XtopLeft, YtopLeft, XbottomRight, YbottomRight), key, None, None,
+                                      is_group=True)
+                            new_b_boxes.append(box)
+                        else:
+                            new_b_boxes.append(filtr(group, list_of_b_boxes))
+            else:
+                new_b_boxes.append(value)
     new_b_labels = [box.label for box in flatten(new_b_boxes)]
     return list(flatten(new_b_boxes)), new_b_labels
 
@@ -157,26 +159,24 @@ def grouping_coordinates(b_boxes_to_merge):
            max(XbottomRightList), max(YbottomRightList)
 
 
-def grouping(boxes_counted, pred, scene, image_w, image_h):
+def grouping(boxes_counted, pred, scene):
     new_b_boxes, new_b_labels = grouping_ids(boxes_counted, pred)
     new_scene, v_labels_matlab, v_boxes_matlab, v_labels_matlab_sequential \
-        = new_gtruth(new_b_boxes, scene, image_w, image_h)
+        = new_gtruth(new_b_boxes, scene)
     return new_scene, v_labels_matlab, v_boxes_matlab, v_labels_matlab_sequential, new_b_boxes
 
 
 # new scene object with grouped objects
-def new_gtruth(new_b_boxes, scene, image_w, image_h):
+def new_gtruth(new_b_boxes, scene):
     new_labels = list()
     v_boxes_matlab = []
-    obj_number = 1
-    b = [0, 0, 10, 10, image_w, image_h]
-    v_labels_matlab = ['scene']
-    v_labels_matlab_sequential = ['scene']
-    v_boxes_matlab.append(b)
+    v_labels_matlab = []
+    v_labels_matlab_sequential = []
 
     # list of b_boxes to group
-    for box in new_b_boxes:
-        XtopLeft, YtopLeft, XbottomRight, YbottomRight = box.box.XtopLeft, box.box.YtopLeft, box.box.XbottomRight, box.box.YbottomRight
+    for idx, box in enumerate(new_b_boxes):
+        XtopLeft, YtopLeft, XbottomRight, YbottomRight = box.box.XtopLeft, box.box.YtopLeft, \
+                                                         box.box.XbottomRight, box.box.YbottomRight
         width = XbottomRight - XtopLeft
         height = YbottomRight - YtopLeft
 
@@ -185,11 +185,10 @@ def new_gtruth(new_b_boxes, scene, image_w, image_h):
                 v_labels_matlab.append(lab)
             return v_labels_matlab.index(lab)
 
-        box.id = obj_number
-        b = [obj_number, check_labels(box.label), XtopLeft, YtopLeft, width, height]
+        box.id = idx
+        b = [idx, check_labels(box.label), XtopLeft, YtopLeft, width, height]
         v_boxes_matlab.append(b)
         v_labels_matlab_sequential.append(box.label)
-        obj_number += 1
 
     size = scene.size
     onames = v_labels_matlab

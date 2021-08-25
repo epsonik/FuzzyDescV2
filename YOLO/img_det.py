@@ -153,13 +153,10 @@ class Box:
         self.is_group = is_group
 
 
-def return_coordinates(v_boxes, v_labels, image_w, image_h):
+def return_coordinates(v_boxes, v_labels):
     v_boxes_matlab = []
-    obj_number = 1
-    b = [0, 0, 10, 10, image_w, image_h]
-    v_labels_matlab = ['scene']
-    v_labels_matlab_sequential = ['scene']
-    v_boxes_matlab.append(b)
+    v_labels_matlab = []
+    v_labels_matlab_sequential = []
     for idx, box in enumerate(v_boxes):
         y1, x1, y2, x2 = box.YtopLeft, box.XtopLeft, box.YbottomRight, box.XbottomRight
         width, height = box.calculate_width(), box.calculate_height()
@@ -169,15 +166,14 @@ def return_coordinates(v_boxes, v_labels, image_w, image_h):
                 v_labels_matlab.append(lab)
             return v_labels_matlab.index(lab)
 
-        b = [obj_number, check_labels(v_labels[idx]), x1, y1, width, height]
+        b = [idx, check_labels(v_labels[idx]), x1, y1, width, height]
         v_boxes_matlab.append(b)
         v_labels_matlab_sequential.append(v_labels[idx])
-        obj_number += 1
     return v_boxes_matlab, v_labels_matlab, v_labels_matlab_sequential
 
 
 # draw all results
-def draw_boxes(filename, photo_boxed_filename, v_boxes, v_labels, boxes_counted):
+def draw_boxes(filename, filename_boxed, v_boxes, v_labels, boxes_counted):
     # load the image
     data = pyplot.imread(filename)
     # plot the image
@@ -190,7 +186,7 @@ def draw_boxes(filename, photo_boxed_filename, v_boxes, v_labels, boxes_counted)
     for box_c in boxes_counted.keys():
         box_colors[box_c] = fake.hex_color()
 
-    for box in v_boxes[1:]:
+    for box in v_boxes:
         # get coordinates
         x1, y1 = box[2], box[3]
         # calculate width and height of the box
@@ -204,7 +200,7 @@ def draw_boxes(filename, photo_boxed_filename, v_boxes, v_labels, boxes_counted)
         # draw text and score in top left corner
         pyplot.text(x1, y1, "%d" % (box[0]), color="white")
     # show the plot
-    pyplot.savefig(photo_boxed_filename)
+    pyplot.savefig(filename_boxed)
     pyplot.show()
 
 

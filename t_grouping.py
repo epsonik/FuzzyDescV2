@@ -9,7 +9,7 @@ def test_data():
     size = (640, 480)
     ocols = []
     onames = ['scene', 'oven', 'bottle', 'sink', 'wine glass']
-    image = Image.open('./images/grouping_test/496083169_7e5ab493fb_z.jpg')
+    image = Image.open('496083169_7e5ab493fb_z.jpg')
     obj_org = np.array([[0, 0, 10, 10, 640, 480],
                         [1, 1, 420, 252, 220, 256],
                         [2, 2, 343, 109, 27, 121],
@@ -37,7 +37,7 @@ def test_data():
          [10, 4, 486, 154, 30, 99],
          [11, 2, 424, 175, 30, 98]])
 
-    fname = './images/grouping_test/6813627120_a222bcba0d_z.jpg'
+    fname = '6813627120_a222bcba0d_z.jpg'
     background2 = []
     background = []
     ocolors = []
@@ -46,7 +46,9 @@ def test_data():
                   background=background, background2=background2)
     v_labels_sequential = ['scene', 'oven', 'bottle', 'bottle', 'bottle', 'bottle', 'sink', 'wine glass', 'wine glass',
                            'bottle', 'wine glass', 'bottle']
-    v_boxes = [BoundBox(XbottomRight=640, XtopLeft=420, YbottomRight=508, YtopLeft=252, label='oven', label_id=1),
+    v_boxes = [BoundBox(XtopLeft=10, YtopLeft=10, XbottomRight=640 + 10, YbottomRight=480 + 10, label='scene',
+                        label_id=0),
+               BoundBox(XbottomRight=640, XtopLeft=420, YbottomRight=508, YtopLeft=252, label='oven', label_id=1),
                BoundBox(XbottomRight=370, XtopLeft=343, YbottomRight=230, YtopLeft=109, label='bottle', label_id=2),
                BoundBox(XbottomRight=428, XtopLeft=397, YbottomRight=228, YtopLeft=113, label='bottle', label_id=3),
                BoundBox(XbottomRight=452, XtopLeft=426, YbottomRight=230, YtopLeft=110, label='bottle', label_id=4),
@@ -57,5 +59,7 @@ def test_data():
                BoundBox(XbottomRight=483, XtopLeft=459, YbottomRight=252, YtopLeft=155, label='bottle', label_id=9),
                BoundBox(XbottomRight=516, XtopLeft=486, YbottomRight=253, YtopLeft=154, label='wine glass',
                         label_id=10),
-               BoundBox(XbottomRight=454, XtopLeft=424, YbottomRight=273, YtopLeft=175, label='bottle', label_id=11)]
+               BoundBox(XbottomRight=454, XtopLeft=424, YbottomRight=273, YtopLeft=175, label='bottle', label_id=11),
+               ]
+
     return scene, v_labels_sequential, v_boxes, size[0], size[1]

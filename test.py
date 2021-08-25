@@ -21,9 +21,10 @@ def from_pic(input_filename):
     photo_boxed_filename = input_filename.replace('.jpg', '_boxed.jpg')
     v_boxes, v_labels, v_scores, image_w, image_h = vbox_engine(input_filename,
                                                                 photo_boxed_filename)
-    v_boxes.append(BoundBox(XbottomRight=640, XtopLeft=0, YbottomRight=480, YtopLeft=0, label='scene', label_id=1))
-    v_boxes_matlab, v_labels_matlab, v_labels_matlab_sequential = return_coordinates(v_boxes, v_labels,
-                                                                                     image_w, image_h)
+    v_boxes.insert(0, BoundBox(XtopLeft=10, YtopLeft=10, XbottomRight=image_w + 10, YbottomRight=image_h + 10,
+                               label='scene', label_id=0))
+    v_labels.insert(0, 'scene')
+    v_boxes_matlab, v_labels_matlab, v_labels_matlab_sequential = return_coordinates(v_boxes, v_labels)
 
     image = Image.open(input_filename)
 
@@ -45,25 +46,26 @@ def from_pic(input_filename):
 
 
 def for_img(input_filename):
-    photo_boxed_filename = input_filename.replace('.jpg', '_boxed.jpg')
     # gtruth, v_labels_matlab, v_labels_matlab_sequential, v_boxes, image_w, image_h = from_pic(input_filename)
     gtruth, v_labels_matlab_sequential, v_boxes, image_w, image_h = test_data()
     # gtruth, v_labels_sequential = test_data()
     pred_sort, fuzzy = generate_description(gtruth)
     boxes_counted = count_ids(pred_sort, gtruth, v_boxes)
-    # draw_boxes(input_filename, photo_boxed_filename, gtruth.obj, v_labels_matlab_sequential, boxes_counted)
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images/grouping_test/boxes/'+input_filename)
+    draw_boxes(input_filename, data_path.replace('.jpg', '_boxed.jpg'), gtruth.obj[1:],
+               v_labels_matlab_sequential, boxes_counted)
 
     gtruth, v_labels_matlab, v_boxes_matlab, v_labels_matlab_sequential, v_boxes = grouping(boxes_counted, pred_sort,
-                                                                                            gtruth,
-                                                                                            image_w, image_h)
+                                                                                            gtruth)
 
-    pred_sort, gtruth, fuzzy = generate_description(gtruth)
-    boxes_counted = count_ids_g(pred_sort, gtruth, v_boxes)
+    pred_sort, fuzzy = generate_description(gtruth)
+    boxes_counted = count_ids_g(pred_sort, gtruth)
     # print(verbalize_pred_pl(pred_sort, gtruth, fuzzy, boxes))
-    # print(verbalize_pred_eng(pred_sort, gtruth, fuzzy, boxes_counted))
-    print(verbalize_pred(pred_sort, gtruth, fuzzy, boxes_counted))
-
-    draw_boxes(input_filename, input_filename.replace('.jpg', '_boxed2.jpg'), gtruth.obj, v_labels_matlab_sequential,
+    print(verbalize_pred_eng(pred_sort, gtruth, fuzzy, boxes_counted))
+    print(verbalize_pred(pred_sort, gtruth, fuzzy))
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images/grouping_test/boxes/'+input_filename)
+    draw_boxes(input_filename, data_path.replace('.jpg', '_boxed_grouped.jpg'), gtruth.obj[1:],
+               v_labels_matlab_sequential,
                boxes_counted)
 
 
@@ -74,5 +76,7 @@ def for_img(input_filename):
 # Prints in the console the variable as requested
 # d = './images'
 # print([for_img(d + "/" + f) for f in os.listdir(d)])
-d = './images/grouping_test'
-print([for_img(d + "/" + f) for f in os.listdir(d)])
+os.chdir('./images/grouping_test')
+files = [f for f in os.listdir('.') if os.path.isfile(f)]
+for f in files:
+    for_img(f)
