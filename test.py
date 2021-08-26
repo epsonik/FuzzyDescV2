@@ -58,9 +58,9 @@ def for_img(input_filename):
                                                                                             gtruth)
 
     pred_sort, fuzzy = generate_description(gtruth)
-    boxes_counted = count_ids_g(pred_sort, gtruth, v_boxes)
+    boxes_counted, boxes_counted_sep = count_ids_g(pred_sort, gtruth, v_boxes)
     # print(verbalize_pred_pl(pred_sort, gtruth, fuzzy, boxes))
-    print(verbalize_pred_eng(pred_sort, gtruth, fuzzy, boxes_counted))
+    print(verbalize_pred_eng(pred_sort, gtruth, fuzzy, boxes_counted, boxes_counted_sep))
     print(verbalize_pred(pred_sort, gtruth, fuzzy))
     data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images/grouping_test/boxes/'+input_filename)
     draw_boxes(input_filename, data_path.replace('.jpg', '_boxed_grouped.jpg'), gtruth.obj[1:],

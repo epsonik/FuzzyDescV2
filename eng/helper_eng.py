@@ -23,13 +23,13 @@ def load_lang_data_eng():
     return frameworks_location, frameworks_orientation, data_multilingual_obj_names, data_multilingual_obj_names_lm
 
 
-def verbalize_pred_eng(pred, scene, fuzzy, boxes):
+def verbalize_pred_eng(pred, scene, fuzzy, boxes, boxes_counted_sep):
     txt = ""
     frameworks_location, \
     frameworks_orientation, \
     data_multilingual_obj_names, data_multilingual_obj_names_lm = load_lang_data_eng()
 
-    preambule = generate_preambule(data_multilingual_obj_names, data_multilingual_obj_names_lm, boxes)
+    preambule = generate_preambule(data_multilingual_obj_names_lm, boxes, boxes_counted_sep)
     txt = txt.__add__(preambule)
     txt = txt.__add__("\n")
     for i in range(len(pred)):
@@ -53,26 +53,35 @@ def verbalize_pred_eng(pred, scene, fuzzy, boxes):
     return txt
 
 
-def generate_preambule(data_multilingual_obj_names, data_multilingual_obj_names_lm, boxes):
+def generate_preambule(data_multilingual_obj_names_lm, boxes, boxes_counted_sep):
     preambule = ""
     preambule_single = 'On the picture we see '
 
     framework = "{}"
-    many = dict(filter(lambda elem: len(elem[1]) > 1 and elem[0] is not "scene", boxes.items()))
-    single = dict(filter(lambda elem: len(elem[1]) <= 1 and elem[0] is not "scene", boxes.items()))
+
+    def filtr(n):
+        d = dict()
+        for key in boxes_counted_sep.keys():
+            if key is not "scene":
+                d[key] = boxes_counted_sep[key][n]
+        return d
+
+    groups = filtr("group")
+    single = filtr("single")
     for object_name in single.keys():
         preambule_single = preambule_single.__add__(framework.format(object_name))
         preambule_single = preambule_single.__add__(dot_or_comma(object_name, single))
     preambule_single = preambule_single.capitalize()
     preambule = preambule.__add__(preambule_single)
-    if len(many.keys()) >= 1:
+
+    if len(groups.keys()) >= 1:
         preambule_many = ' We see also '
-        for object_name in many.keys():
+        for object_name in groups.keys():
             number_of_obj_for_label = len(boxes[object_name])
-            sentence = create_replacement_lm(data_multilingual_obj_names_lm, object_name, framework,
+            sentence = create_replacement_lm(data_multilingual_obj_names_lm, object_name,
                                              number_of_obj_for_label)
             preambule_many = preambule_many.__add__(sentence)
-            preambule_many = preambule_many.__add__(dot_or_comma(object_name, many))
+            preambule_many = preambule_many.__add__(dot_or_comma(object_name, groups))
         preambule = preambule.__add__(preambule_many)
 
     return preambule
@@ -92,7 +101,8 @@ def create_replacement(framework_location, framework_orientation, resolved_obj_n
         sequence_id_verb_name = get_verb_numerical(sequence_id, numerical)
         s = "{" + a_string + "}"
         if sequence_id_verb_name is not '':
-            sentence = sentence.replace(s, "{} {}".format(sequence_id_verb_name, resolved_obj_names_array[object_place]))
+            sentence = sentence.replace(s,
+                                        "{} {}".format(sequence_id_verb_name, resolved_obj_names_array[object_place]))
         sentence = sentence.replace(s, resolved_obj_names_array[object_place])
 
     regex_orientation = r'\[(.*?)\]'
@@ -102,22 +112,21 @@ def create_replacement(framework_location, framework_orientation, resolved_obj_n
     return sentence
 
 
-def create_replacement_lm(data_multilingual_obj_names_lm, object_name, framework, number_of_obj_for_label):
-    regex = r'\{(.*?)\}'
-    obj_places = re.findall(regex, framework)
-    sentence = copy.copy(framework)
-    for a_string in obj_places:
-        object_case_name = 'LM'
-        object_row = get_row(data_multilingual_obj_names_lm, object_name)
-        numerical = load_numerical_data_lm()
-        verbal_name = get_verb_numerical(number_of_obj_for_label, numerical, col='VERB')
-        s = "{" + a_string + "}"
-        if verbal_name is not '':
-            sentence = sentence.replace(s,
-                                        "{} {}".format(verbal_name,
-                                                       object_row[object_case_name]))
-        sentence = sentence.replace(s, object_row[object_case_name])
-    return sentence
+def create_replacement_lm(data_multilingual_obj_names_lm, object_name, number_of_obj_for_label):
+    framework_s = "{} group of {}"
+    framework_lm = "{} groups of {}"
+    object_case_name = 'LM'
+    object_row = get_row(data_multilingual_obj_names_lm, object_name)
+
+    numerical = load_numerical_data_lm()
+    verbal_name = get_verb_numerical(number_of_obj_for_label, numerical, col='VERB')
+
+    if verbal_name is not '':
+        if number_of_obj_for_label != 1:
+            return framework_lm.format(verbal_name, object_row[object_case_name])
+        else:
+            return framework_s.format(verbal_name, object_row[object_case_name])
+    return {}
 
 
 def load_numerical_data():

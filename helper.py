@@ -271,7 +271,7 @@ def count_ids_g(pred, scene, v_boxes):
         check_labels(second_obj_name, int(curr_pred[2]))
     for key in boxes2.keys():
         boxes3[key] = list(boxes2[key]['single'] + boxes2[key]['group'])
-    return boxes3
+    return boxes3, boxes2
 
 
 def find_name(data, name):
