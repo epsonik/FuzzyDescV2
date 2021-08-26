@@ -1,4 +1,6 @@
 import copy
+import functools
+import operator
 import os
 import re
 from collections import Counter
@@ -14,6 +16,7 @@ import pandas as pd
 #  macierz wyjsciowa:
 #  wiersze - obiekty referencyjne - względem nich określamy położenie
 #  kolumny - obiekty dla których określamy położenie
+from setuptools.namespaces import flatten
 
 from data import *
 
@@ -237,7 +240,7 @@ def count_ids(pred, scene, v_boxes):
 
 def count_ids_g(pred, scene, v_boxes):
     boxes2 = dict()
-
+    boxes3 = {}
     for i in range(len(pred)):
         curr_pred = pred[i, :]
         first_obj_name = scene.onames[scene.obj[int(curr_pred[0]), 1]]
@@ -253,20 +256,22 @@ def count_ids_g(pred, scene, v_boxes):
                 else:
                     boxes2[object_name]['single'].append(b)
             else:
-                key_id = attrgetter("id")
+                def p(a):
+                    key_id = attrgetter("id")
+                    if not any(key_id(i) == obj_number for i in a):
+                        b.seq_id = len(a) + 1
+                        a.append(b)
+
                 if b.is_group:
-                    if not any(key_id(i) == obj_number for i in boxes2[object_name]['group']):
-                        b.seq_id = len(boxes2[object_name]['group']) + 1
-                        boxes2[object_name]['group'].append(b)
+                    p(boxes2[object_name]['group'])
                 else:
-                    if not any(key_id(i) == obj_number for i in boxes2[object_name]['single']):
-                        b.seq_id = len(boxes2[object_name]['single']) + 1
-                        boxes2[object_name]['single'].append(b)
+                    p(boxes2[object_name]['single'])
 
         check_labels(first_obj_name, int(curr_pred[0]))
         check_labels(second_obj_name, int(curr_pred[2]))
-
-    return boxes2
+    for key in boxes2.keys():
+        boxes3[key] = list(boxes2[key]['single'] + boxes2[key]['group'])
+    return boxes3
 
 
 def find_name(data, name):
