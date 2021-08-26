@@ -178,7 +178,7 @@ def return_coordinates(v_boxes, v_labels):
 
 
 # draw all results
-def draw_boxes(filename, filename_boxed, v_boxes, v_labels, boxes_counted):
+def draw_boxes(filename, filename_boxed, v_boxes_matlab_format, v_labels, boxes_counted):
     # load the image
     data = pyplot.imread(filename)
     # plot the image
@@ -191,7 +191,7 @@ def draw_boxes(filename, filename_boxed, v_boxes, v_labels, boxes_counted):
     for box_c in boxes_counted.keys():
         box_colors[box_c] = fake.hex_color()
     list_of_b_boxes = functools.reduce(operator.iconcat, list(boxes_counted.values()), [])
-    for box in v_boxes:
+    for box in v_boxes_matlab_format:
         # get coordinates
         x1, y1 = box[2], box[3]
         # calculate width and height of the box

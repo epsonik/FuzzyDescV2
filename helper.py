@@ -244,19 +244,28 @@ def count_ids_g(pred, scene, v_boxes):
         second_obj_name = scene.onames[scene.obj[int(curr_pred[2]), 1]]
 
         def check_labels(object_name, obj_number):
+            b = v_boxes[obj_number]
             if object_name not in boxes2:
-                b = v_boxes[obj_number]
                 b.seq_id = 1
-                boxes2[object_name] = [b]
+                boxes2[object_name] = {'group': [], 'single': []}
+                if b.is_group:
+                    boxes2[object_name]['group'].append(b)
+                else:
+                    boxes2[object_name]['single'].append(b)
             else:
                 key_id = attrgetter("id")
-                if not any(key_id(i) == obj_number for i in boxes2[object_name]):
-                    b = v_boxes[obj_number]
-                    b.seq_id = len(boxes2[object_name]) + 1
-                    boxes2[object_name].append(b)
+                if b.is_group:
+                    if not any(key_id(i) == obj_number for i in boxes2[object_name]['group']):
+                        b.seq_id = len(boxes2[object_name]['group']) + 1
+                        boxes2[object_name]['group'].append(b)
+                else:
+                    if not any(key_id(i) == obj_number for i in boxes2[object_name]['single']):
+                        b.seq_id = len(boxes2[object_name]['single']) + 1
+                        boxes2[object_name]['single'].append(b)
 
         check_labels(first_obj_name, int(curr_pred[0]))
         check_labels(second_obj_name, int(curr_pred[2]))
+
     return boxes2
 
 

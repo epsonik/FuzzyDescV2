@@ -67,7 +67,6 @@ def for_img(input_filename):
                v_labels_matlab_sequential,
                boxes_counted)
 
-
 # process_for_grouping()
 # input_filename = input("Enter a file name to load bBoxes. Data must be delimited with ',': ")
 
