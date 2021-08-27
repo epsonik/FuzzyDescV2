@@ -50,6 +50,9 @@ def verbalize_pred_eng(pred, scene, fuzzy, boxes, boxes_counted):
         sentence = sentence.capitalize()
         txt = txt.__add__(sentence)
         txt = txt.__add__("\n")
+        txt = txt.__add__("{} {} {} {}".format(int(curr_pred[0]), scene.onames[scene.obj[int(curr_pred[0]), 1]],
+                          int(curr_pred[2]), scene.onames[scene.obj[int(curr_pred[2]), 1]]))
+        txt = txt.__add__("\n")
     return txt
 
 
@@ -80,6 +83,10 @@ def verbalize_pred_eng_s(pred, scene, fuzzy, boxes):
         sentence = sentence.capitalize()
         txt = txt.__add__(sentence)
         txt = txt.__add__("\n")
+        txt = txt.__add__("{} {} {} {}".format(int(curr_pred[0]), scene.onames[scene.obj[int(curr_pred[0]), 1]],
+                          int(curr_pred[2]), scene.onames[scene.obj[int(curr_pred[2]), 1]]))
+
+        txt = txt.__add__("\n")
     return txt
 
 
@@ -109,7 +116,7 @@ def generate_preambule(data_multilingual_obj_names_lm, boxes, boxes_counted_sep)
     if len(groups.keys()) >= 1:
         preambule_many = ' We see also '
         for object_name in groups.keys():
-            number_of_obj_for_label = len(boxes[object_name])
+            number_of_obj_for_label = len(groups[object_name])
             sentence = create_replacement_lm(data_multilingual_obj_names_lm, object_name,
                                              number_of_obj_for_label)
             preambule_many = preambule_many.__add__(sentence)
