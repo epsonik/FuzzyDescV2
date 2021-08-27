@@ -9,7 +9,7 @@ def test_data():
     size = (640, 480)
     ocols = []
     onames = ['scene', 'oven', 'bottle', 'sink', 'wine glass']
-    image = Image.open('496083169_7e5ab493fb_z.jpg')
+    image = Image.open('10.jpg')
     obj_org = np.array([[0, 0, 10, 10, 640, 480],
                         [1, 1, 420, 252, 220, 256],
                         [2, 2, 343, 109, 27, 121],
