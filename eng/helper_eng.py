@@ -23,13 +23,43 @@ def load_lang_data_eng():
     return frameworks_location, frameworks_orientation, data_multilingual_obj_names, data_multilingual_obj_names_lm
 
 
-def verbalize_pred_eng(pred, scene, fuzzy, boxes, boxes_counted_sep):
+def verbalize_pred_eng(pred, scene, fuzzy, boxes, boxes_counted):
     txt = ""
     frameworks_location, \
     frameworks_orientation, \
     data_multilingual_obj_names, data_multilingual_obj_names_lm = load_lang_data_eng()
 
-    preambule = generate_preambule(data_multilingual_obj_names_lm, boxes, boxes_counted_sep)
+    preambule = generate_preambule(data_multilingual_obj_names_lm, boxes, boxes_counted)
+    txt = txt.__add__(preambule)
+    txt = txt.__add__("\n")
+    for i in range(len(pred)):
+        curr_pred = pred[i, :]
+        ty = int(curr_pred[4])
+        location_name_curr = fuzzy.lev3.tname[ty]
+
+        o = int(curr_pred[6])
+        orientation_name_curr = fuzzy.lev3.oname[o]
+        first_obj_name = scene.onames[scene.obj[int(curr_pred[0]), 1]]
+        second_obj_name = scene.onames[scene.obj[int(curr_pred[2]), 1]]
+
+        framework_location = random_framework(frameworks_location[location_name_curr][0])
+        framework_orientation = random_framework(frameworks_orientation[orientation_name_curr][0])
+        sentence = create_replacement(framework_location, framework_orientation,
+                                      [first_obj_name, second_obj_name], boxes,
+                                      [int(curr_pred[0]), int(curr_pred[2])])
+        sentence = sentence.capitalize()
+        txt = txt.__add__(sentence)
+        txt = txt.__add__("\n")
+    return txt
+
+
+def verbalize_pred_eng_s(pred, scene, fuzzy, boxes):
+    txt = ""
+    frameworks_location, \
+    frameworks_orientation, \
+    data_multilingual_obj_names, data_multilingual_obj_names_lm = load_lang_data_eng()
+
+    preambule = generate_preambule_s(data_multilingual_obj_names_lm, boxes)
     txt = txt.__add__(preambule)
     txt = txt.__add__("\n")
     for i in range(len(pred)):
@@ -56,18 +86,20 @@ def verbalize_pred_eng(pred, scene, fuzzy, boxes, boxes_counted_sep):
 def generate_preambule(data_multilingual_obj_names_lm, boxes, boxes_counted_sep):
     preambule = ""
     preambule_single = 'On the picture we see '
-
     framework = "{}"
 
-    def filtr(n):
-        d = dict()
+    def filtr():
+        groups = dict()
+        single = dict()
         for key in boxes_counted_sep.keys():
             if key is not "scene":
-                d[key] = boxes_counted_sep[key][n]
-        return d
+                if boxes_counted_sep[key]["group"]:
+                    groups[key] = boxes_counted_sep[key]["group"]
+                if boxes_counted_sep[key]["single"]:
+                    single[key] = boxes_counted_sep[key]["single"]
+        return groups, single
 
-    groups = filtr("group")
-    single = filtr("single")
+    groups, single = filtr()
     for object_name in single.keys():
         preambule_single = preambule_single.__add__(framework.format(object_name))
         preambule_single = preambule_single.__add__(dot_or_comma(object_name, single))
@@ -87,6 +119,31 @@ def generate_preambule(data_multilingual_obj_names_lm, boxes, boxes_counted_sep)
     return preambule
 
 
+def generate_preambule_s(data_multilingual_obj_names_lm, boxes):
+    preambule = ""
+    preambule_single = 'On the picture we see '
+
+    framework = "{}"
+    many = dict(filter(lambda elem: len(elem[1]) > 1 and elem[0] is not "scene", boxes.items()))
+    single = dict(filter(lambda elem: len(elem[1]) <= 1 and elem[0] is not "scene", boxes.items()))
+    for object_name in single.keys():
+        preambule_single = preambule_single.__add__(framework.format(object_name))
+        preambule_single = preambule_single.__add__(dot_or_comma(object_name, single))
+    preambule_single = preambule_single.capitalize()
+    preambule = preambule.__add__(preambule_single)
+    if len(many.keys()) >= 1:
+        preambule_many = ' We see also '
+        for object_name in many.keys():
+            number_of_obj_for_label = len(boxes[object_name])
+            sentence = create_replacement_lm_s(data_multilingual_obj_names_lm, object_name, framework,
+                                               number_of_obj_for_label)
+            preambule_many = preambule_many.__add__(sentence)
+            preambule_many = preambule_many.__add__(dot_or_comma(object_name, many))
+        preambule = preambule.__add__(preambule_many)
+
+    return preambule
+
+
 def create_replacement(framework_location, framework_orientation, resolved_obj_names_array, boxes,
                        resolved_obj_places_array):
     regex_location = r'\{(.*?)\}'
@@ -100,6 +157,7 @@ def create_replacement(framework_location, framework_orientation, resolved_obj_n
         numerical = load_numerical_data()
         sequence_id_verb_name = get_verb_numerical(sequence_id, numerical)
         s = "{" + a_string + "}"
+
         if sequence_id_verb_name is not '':
             sentence = sentence.replace(s,
                                         "{} {}".format(sequence_id_verb_name, resolved_obj_names_array[object_place]))
@@ -127,6 +185,24 @@ def create_replacement_lm(data_multilingual_obj_names_lm, object_name, number_of
         else:
             return framework_s.format(verbal_name, object_row[object_case_name])
     return {}
+
+
+def create_replacement_lm_s(data_multilingual_obj_names_lm, object_name, framework, number_of_obj_for_label):
+    regex = r'\{(.*?)\}'
+    obj_places = re.findall(regex, framework)
+    sentence = copy.copy(framework)
+    for a_string in obj_places:
+        object_case_name = 'LM'
+        object_row = get_row(data_multilingual_obj_names_lm, object_name)
+        numerical = load_numerical_data_lm()
+        verbal_name = get_verb_numerical(number_of_obj_for_label, numerical, col='VERB')
+        s = "{" + a_string + "}"
+        if verbal_name is not '':
+            sentence = sentence.replace(s,
+                                        "{} {}".format(verbal_name,
+                                                       object_row[object_case_name]))
+        sentence = sentence.replace(s, object_row[object_case_name])
+    return sentence
 
 
 def load_numerical_data():

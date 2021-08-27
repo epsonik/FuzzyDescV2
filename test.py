@@ -9,7 +9,7 @@ from YOLO.bound_box import BoundBox
 from YOLO.img_det import vbox_engine, draw_boxes, return_coordinates
 import numpy as np
 
-from eng.helper_eng import verbalize_pred_eng
+from eng.helper_eng import verbalize_pred_eng, verbalize_pred_eng_s
 from grouping.Intersection import grouping
 from helper import generate_description, count_ids, verbalize_pred, count_ids_g
 from t_grouping import test_data
@@ -46,13 +46,15 @@ def from_pic(input_filename):
 
 
 def for_img(input_filename):
-    # gtruth, v_labels_matlab, v_labels_matlab_sequential, v_boxes, image_w, image_h = from_pic(input_filename)
-    gtruth, v_labels_matlab_sequential, v_boxes, image_w, image_h = test_data()
+    gtruth, v_labels_matlab, v_labels_matlab_sequential, v_boxes, image_w, image_h = from_pic(input_filename)
+    # gtruth, v_labels_matlab_sequential, v_boxes, image_w, image_h = test_data()
     pred_sort, fuzzy = generate_description(gtruth)
     boxes_counted = count_ids(pred_sort, gtruth, v_boxes)
-    # data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images/grouping_test/boxes/'+input_filename)
-    # draw_boxes(input_filename, data_path.replace('.jpg', '_boxed.jpg'), gtruth.obj[1:],
-    #            v_labels_matlab_sequential, boxes_counted)
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images/grouping_test/boxes/'+input_filename)
+    print(verbalize_pred_eng_s(pred_sort, gtruth, fuzzy, boxes_counted))
+
+    draw_boxes(input_filename, data_path.replace('.jpg', '_boxed.jpg'), gtruth.obj[1:],
+               v_labels_matlab_sequential, boxes_counted)
 
     gtruth, v_labels_matlab, v_boxes_matlab, v_labels_matlab_sequential, v_boxes = grouping(boxes_counted, pred_sort,
                                                                                             gtruth)
@@ -61,7 +63,7 @@ def for_img(input_filename):
     boxes_counted, boxes_counted_sep = count_ids_g(pred_sort, gtruth, v_boxes)
     # print(verbalize_pred_pl(pred_sort, gtruth, fuzzy, boxes))
     print(verbalize_pred_eng(pred_sort, gtruth, fuzzy, boxes_counted, boxes_counted_sep))
-    print(verbalize_pred(pred_sort, gtruth, fuzzy))
+    # print(verbalize_pred(pred_sort, gtruth, fuzzy))
     data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images/grouping_test/boxes/'+input_filename)
     draw_boxes(input_filename, data_path.replace('.jpg', '_boxed_grouped.jpg'), gtruth.obj[1:],
                v_labels_matlab_sequential,
