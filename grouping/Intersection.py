@@ -24,7 +24,8 @@ def generate_groups(intersection_mtx):
     k = set()
     for idx, _ in enumerate(intersection_mtx):
         k.add(g.DFS(idx))
-    return [list(x) for x in k]
+    f = [list(x) for x in k if len(list(x)) > 1]
+    return f
 
 
 def _adj_width_height(box, n):
@@ -41,6 +42,7 @@ def generate_inter_matrix(ids, pred):
     for row in df:
         fuzzy_mutual_position_matrix = row[8]
         intersection_mtx[int(row[0]), int(row[2])] = fuzzy_mutual_position_matrix
+        intersection_mtx[int(row[2]), int(row[0])] = fuzzy_mutual_position_matrix
     return intersection_mtx
 
 
@@ -53,12 +55,13 @@ def grouping_ids(boxes_with_order_numbers, pred):
     for key, value in boxes_with_order_numbers.items():
         if key is not 'scene':
             if len(value) > 1:
+                b_boxes_groups_separated = list()
                 key_id = attrgetter("id")
                 ids = [key_id(box) for box in value]
                 inter_mtx = generate_inter_matrix(ids, pred)
-                separated_groups_of_b_boxes = generate_groups(inter_mtx)
-                if separated_groups_of_b_boxes:
-                    for group in separated_groups_of_b_boxes:
+                b_boxes_groups_separated = generate_groups(inter_mtx)
+                if b_boxes_groups_separated:
+                    for group in b_boxes_groups_separated:
                         if len(group) >= 2:
                             XtopLeft, YtopLeft, XbottomRight, YbottomRight = grouping_coordinates(
                                 filtr(group, list_of_b_boxes))
@@ -67,6 +70,8 @@ def grouping_ids(boxes_with_order_numbers, pred):
                             new_b_boxes.append(box)
                         else:
                             new_b_boxes.append(filtr(group, list_of_b_boxes))
+                else:
+                    new_b_boxes.append(value)
             else:
                 new_b_boxes.append(value)
     new_b_labels = [box.label for box in flatten(new_b_boxes)]
