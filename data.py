@@ -4,7 +4,6 @@ from Lev3 import Lev3
 import numpy as np
 from texts import *
 
-
 marg = 0.2
 # daleko
 inf = 100
@@ -197,10 +196,10 @@ def load_etykiety():
     sa = 8
 
     lev3 = Lev3(maxt=10,
-                type=['FA', 'NE', 'CL', 'TO', 'CR', 'IN', 'LG', 'SP', 'SA'],
-                tsal=[0.6, 0.7, 0.8, 0.8, 0.9, 0.8, 0.3, 0.9, 1],
-                tname=[FAR, NEAR, CLOSE, TOUCHING, CROSSING, INSIDE, LARGER, SPLIT, SAME],
-                orientation=None, osal=None, oname=None)
+                location=['FA', 'NE', 'CL', 'TO', 'CR', 'IN', 'LG', 'SP', 'SA'],
+                location_sal=[0.6, 0.7, 0.8, 0.8, 0.9, 0.8, 0.3, 0.9, 1],
+                location_names=[FAR, NEAR, CLOSE, TOUCHING, CROSSING, INSIDE, LARGER, SPLIT, SAME],
+                orientation=None, orientation_sal=None, orientation_name=None)
 
     mt = lev3.maxt
     le = 1 * mt
@@ -218,10 +217,10 @@ def load_etykiety():
 
     lev3.orientation = ['LE', 'LA', 'AB', 'RA', 'RI', 'RB', 'BE', 'LB', 'CE', 'HO', 'VE']
 
-    lev3.osal = [0.9, 0.8, 0.9, 0.8, 0.9, 0.8, 0.9, 0.8, 1, 0.9, 0.9]
+    lev3.orientation_sal = [0.9, 0.8, 0.9, 0.8, 0.9, 0.8, 0.9, 0.8, 1, 0.9, 0.9]
 
-    lev3.oname = [LEFT, LEFT_ABOVE, ABOVE, RIGHT_ABOVE, RIGHT, RIGHT_BELOW, BELOW, LEFT_BELOW,
-                  CENTERED, HORIZONTAL, VERTICAL]
+    lev3.orientation_name = [LEFT, LEFT_ABOVE, ABOVE, RIGHT_ABOVE, RIGHT, RIGHT_BELOW, BELOW, LEFT_BELOW,
+                             CENTERED, HORIZONTAL, VERTICAL]
 
     fuzzy.lev3 = lev3
 

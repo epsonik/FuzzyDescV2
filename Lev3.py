@@ -1,24 +1,25 @@
 # obiekt fuzyfikacji dla obiektu 2d
 class Lev3():
-    def __init__(self, maxt, type, tsal, tname, orientation, osal, oname):
+    def __init__(self, maxt, location, location_sal, location_names, orientation, orientation_sal, orientation_name):
         if maxt is None:
             maxt = 0
-        if type is None:
-            type = {}
-        if tsal is None:
-            tsal = []
-        if tname is None:
-            tname = {}
+        if location is None:
+            location = {}
+        if location_sal is None:
+            location_sal = []
+        if location_names is None:
+            location_names = {}
         if orientation is None:
             orientation = {}
-        if osal is None:
-            osal = []
-        if oname is None:
-            oname = {}
+        if orientation_sal is None:
+            orientation_sal = []
+        if orientation_name is None:
+            orientation_name = {}
         self.maxt = maxt
-        self.type = type
-        self.tsal = tsal
-        self.tname = tname
+        self.type = location
+        self.location_sal = location_sal
+        self.location_names = location_names
         self.orientation = orientation
-        self.osal = osal
-        self.oname = oname
+        self.orientation_sal = orientation_sal
+        self.orientation_name = orientation_name
+        self.location_names = location_names

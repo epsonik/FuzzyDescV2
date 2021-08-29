@@ -1,42 +1,78 @@
-import copy
-import functools
-import operator
-import os
-import re
-from collections import Counter
 from operator import attrgetter
 import random
 
 import pandas as pd
-
-# macierz FMP dla danej sceny
-# arg. wej:
-#  scene - dane sceny (tu mamy dane o bounding boxach)
-#  fuzzy - paramtery rozmyte
-#  macierz wyjsciowa:
-#  wiersze - obiekty referencyjne - względem nich określamy położenie
-#  kolumny - obiekty dla których określamy położenie
-from setuptools.namespaces import flatten
-
 from data import *
 
 PL = 1
 EN = 0
 BIERNIK = 3
 NARZEDNIK = 4
+fuzzy = load_etykiety()
 
 
-def fmpm(scene, fuzzy):
+def get_location_names_indexes(location_names_txt):
+    return [fuzzy.lev3.location_names.index(location_name) for location_name in location_names_txt]
+
+
+# macierz FMP dla danej sceny
+# arg. wej:
+#  scene - dane sceny (tu mamy dane o bounding boxach)
+#  fuzzy - paramtery rozmyte
+#  macierz wyjsciowa:
+#   wiersze - obiekty referencyjne - względem nich określamy położenie
+#   kolumny - obiekty dla których określamy położenie
+def create_fuzzy_mutual_posions_matrix(scene):
     # liczba obiektow
     obj_num = scene.obj_num
     out = np.zeros((np.amax(fuzzy.fam3) + 1, obj_num, obj_num))
     for i in range(obj_num):
         for j in range(obj_num):
-            out[:, i, j] = get_fuzzy_pos(scene, i, j, fuzzy)
+            out[:, i, j] = get_fuzzy_pos(scene, i, j)
     return out
 
 
-def get_fuzzy_pos(scene, refobj, curobj, fuzzy):
+def get_fuzzy_pos(scene, refobj, curobj):
+    def fuzzify(val, fuz):
+        # trapezoidalna funkcja przynaleznosci
+        # arg. wej:
+        # val - liczba
+        # fval - param.trapezoidu (a,b,c,d)
+        def trapezoid_membership_function(val, fval):
+            if (val < fval[0]):
+                out = 0
+            elif (val < fval[1]):
+                out = (val - fval[0]) / (fval[1] - fval[0])
+            elif (val < fval[2]):
+                out = 1
+            elif (val < fval[3]):
+                out = (fval[3] - val) / (fval[3] - fval[2])
+            else:
+                out = 0
+            return float("{:.4f}".format(out))
+
+        len_fuz = len(fuz)
+        outval = np.zeros(len_fuz)
+        for i in range(len(fuz)):
+            a = trapezoid_membership_function(val, fuz[i].thr)
+            outval[i] = a
+        return outval
+
+    #  macierzy skojarzen rozmytych
+    # arg.wej.:
+    # fval1,fval2 - wektory wartosci rozmytych wejsciowych,
+    # fam_matrix - macierz skojarzen rozmytych
+    # wyj:
+    # outval - wektor wyjsciowych wartosci rozmytych
+    def create_fuzzy_association_matrix(fval1, fval2, fam_matrix):
+        outval = np.zeros(np.amax(fam_matrix) + 1)
+        for i in range(len(fval1)):
+            for j in range(len(fval2)):
+                minval = min(fval1[i], fval2[j])
+                if (fam_matrix[i][j] > 0) & (minval > 0):
+                    outval[fam_matrix[i, j]] = max(outval[fam_matrix[i, j]], minval)
+        return outval
+
     x_beg_ref = scene.obj[refobj][2]
     y_beg_ref = scene.obj[refobj][3]
     x_end_ref = scene.obj[refobj][2] + scene.obj[refobj][4]
@@ -59,54 +95,11 @@ def get_fuzzy_pos(scene, refobj, curobj, fuzzy):
     fval_y_beg = fuzzify(y_beg, fuzzy.lev1)
     fval_y_end = fuzzify(y_end, fuzzy.lev1)
 
-    x_fuz = fam(fval_x_beg, fval_x_end, fuzzy.fam2)
-    y_fuz = fam(fval_y_beg, fval_y_end, fuzzy.fam2)
+    x_fuz = create_fuzzy_association_matrix(fval_x_beg, fval_x_end, fuzzy.fam2)
+    y_fuz = create_fuzzy_association_matrix(fval_y_beg, fval_y_end, fuzzy.fam2)
 
-    xy_fuz = fam(y_fuz, x_fuz, fuzzy.fam3)
+    xy_fuz = create_fuzzy_association_matrix(y_fuz, x_fuz, fuzzy.fam3)
     return xy_fuz
-
-
-def fuzzify(val, fuz):
-    len_fuz = len(fuz)
-    outval = np.zeros(len_fuz)
-    for i in range(len(fuz)):
-        a = mf(val, fuz[i].thr)
-        outval[i] = a
-    return outval
-
-
-# trapezoidalna funkcja przynaleznosci
-# arg. wej:
-# val - liczba
-# fval - param.trapezoidu (a,b,c,d)
-def mf(val, fval):
-    if (val < fval[0]):
-        out = 0
-    elif (val < fval[1]):
-        out = (val - fval[0]) / (fval[1] - fval[0])
-    elif (val < fval[2]):
-        out = 1
-    elif (val < fval[3]):
-        out = (fval[3] - val) / (fval[3] - fval[2])
-    else:
-        out = 0
-    return float("{:.4f}".format(out))
-
-
-#  macierzy skojarzen rozmytych
-# arg.wej.:
-# fval1,fval2 - wektory wartosci rozmytych wejsciowych,
-# fam_matrix - macierz skojarzen rozmytych
-# wyj:
-# outval - wektor wyjsciowych wartosci rozmytych
-def fam(fval1, fval2, fam_matrix):
-    outval = np.zeros(np.amax(fam_matrix) + 1)
-    for i in range(len(fval1)):
-        for j in range(len(fval2)):
-            minval = min(fval1[i], fval2[j])
-            if (fam_matrix[i][j] > 0) & (minval > 0):
-                outval[fam_matrix[i, j]] = max(outval[fam_matrix[i, j]], minval)
-    return outval
 
 
 # generuje listę pradykatów wraz z ich cechami
@@ -116,17 +109,17 @@ def fam(fval1, fval2, fam_matrix):
 # cene - dane sceny
 # fuzzy - paramtery rozmyte
 # wyjście - lista predykatów/macierz: wiersze - predykaty, kolumny:
-# 1 - obiekt
-# 2 - istotność obiektu
-# 3 - obiekt referencyjny
-# 4 - istotność obiektu referencyjnego
-# 5 - deskryptor 2D położenia/locus (numer)
-# 6 - istotność deskryptora położenia
-# 7 - deskryptor 2D orientacji/orientation (numer)
-# 8 - istotność deskryptora orientcji
-# 9 - wartość funkcji przynależności
+# 0 - obiekt
+# 1 - istotność obiektu
+# 2 - obiekt referencyjny
+# 3 - istotność obiektu referencyjnego
+# 4 - deskryptor 2D położenia/locus (numer)
+# 5 - istotność deskryptora położenia
+# 6 - deskryptor 2D orientacji/orientation (numer)
+# 7 - istotność deskryptora orientcji
+# 8 - wartość funkcji przynależności
 # nieposortowana lista predykatów
-def get_predicates(fmpm_mat, scene, fuzzy):
+def get_predicates(fmpm_mat, scene):
     # liczba możliwych relacji
     ile_rel, _, ile_ob = fmpm_mat.shape
     # wektor istotności obiektów (kryterium: wielkość):
@@ -139,16 +132,20 @@ def get_predicates(fmpm_mat, scene, fuzzy):
     # równą średniej istotności obiektu:
     obj_sal[0] = max(obj_sal[1:])
     plist = []
-    for i in range(ile_ob):  # iteracja po obiektach
-        for j in range(ile_ob):  # iteracja po obiektach referencyjnych
-            if i != j:
+    for first_obj in range(ile_ob):  # iteracja po obiektach
+        for second_obj in range(ile_ob):  # iteracja po obiektach referencyjnych
+            if first_obj != second_obj:
                 for k in range(ile_rel):
-                    if fmpm_mat[k, j, i] > 0:  # niezerowe deskryptory
+                    if fmpm_mat[k, second_obj, first_obj] > 0:  # niezerowe deskryptory
                         ty = k % fuzzy.lev3.maxt
                         r = int((k - ty) / fuzzy.lev3.maxt) - 1  # orientacja
+                        sal_fist_obj = obj_sal[first_obj]
+                        sal_second_obj = obj_sal[second_obj]
+                        fuzzy_mutual_position_matrix = fmpm_mat[k, second_obj, first_obj]
                         current = np.array(
-                            [i, obj_sal[i], j, obj_sal[j], ty, fuzzy.lev3.tsal[ty], r, fuzzy.lev3.osal[r],
-                             fmpm_mat[k, j, i]])
+                            [first_obj, sal_fist_obj, second_obj, sal_second_obj, ty, fuzzy.lev3.location_sal[ty], r,
+                             fuzzy.lev3.orientation_sal[r],
+                             fuzzy_mutual_position_matrix])
                         plist.append(current)
     return np.array(plist)
 
@@ -159,7 +156,6 @@ def sort_predicates(pred, order):
     to_sort1 = np.insert(pred, pred.shape[1], pred[:, 5], axis=1)
     to_sort = pd.DataFrame(to_sort1).sort_values(by=order, ascending=False)
     to_sort = to_sort.to_numpy()
-    # print(verbalize_pred(np.array(to_sort), gtruth, fuzzy, boxes))
     return to_sort
 
 
@@ -179,16 +175,16 @@ def filter_predicates(to_sort, scene):
     return np.array(pred_out)
 
 
-def verbalize_pred(pred, scene, fuzzy):
+def verbalize_pred(pred, scene):
     zerolab = 1
     txt = ""
 
     for i in range(len(pred)):
         curr_pred = pred[i, :]
         location_number = int(curr_pred[4])
-        location_name_curr = fuzzy.lev3.tname[location_number]
+        location_name_curr = fuzzy.lev3.location_names[location_number]
         orientation_number = int(curr_pred[6])
-        orientation_name_curr = fuzzy.lev3.oname[orientation_number]
+        orientation_name_curr = fuzzy.lev3.orientation_name[orientation_number]
         first_obj_name = scene.onames[scene.obj[int(curr_pred[0]), 1]]
         second_obj_name = scene.onames[scene.obj[int(curr_pred[2]), 1]]
         obj_id_from_predicate = pred[i, 0]
@@ -296,10 +292,9 @@ def get_seq_id(obj_name, id_from_predicate, boxes):
 
 
 def generate_description(gtruth):
-    fuzzy = load_etykiety()
-    fmpm_mat = fmpm(gtruth, fuzzy)
+    fmpm_mat = create_fuzzy_mutual_posions_matrix(gtruth)
 
-    pred = get_predicates(fmpm_mat, gtruth, fuzzy)
+    pred = get_predicates(fmpm_mat, gtruth)
     to_sort = sort_predicates(pred, [1, 5, 8, 3])
     pred_filtered = filter_predicates(to_sort, gtruth)
-    return pred_filtered, fuzzy
+    return pred_filtered, pred

@@ -10,6 +10,10 @@ from YOLO.bound_box import BoundBox
 from grouping.graph import Graph
 import functools
 import operator
+from texts import *
+
+from helper import get_location_names_indexes
+
 
 def generate_groups(intersection_mtx):
     g = Graph()
@@ -20,7 +24,7 @@ def generate_groups(intersection_mtx):
     k = set()
     for idx, _ in enumerate(intersection_mtx):
         k.add(g.DFS(idx))
-    return [list(x) for x in k if len(list(x)) > 1]
+    return [list(x) for x in k]
 
 
 def _adj_width_height(box, n):
@@ -30,31 +34,29 @@ def _adj_width_height(box, n):
 
 
 def generate_inter_matrix(ids, pred):
-    allowed_location_names = [2, 3, 4, 5, 6, 7, 8]
+    allowed_location_names = get_location_names_indexes([CLOSE, TOUCHING, CROSSING, INSIDE, LARGER, SPLIT, SAME])
     df = pred[np.in1d(pred[:, 0], ids) & np.in1d(pred[:, 2], ids) & np.in1d(pred[:, 4], allowed_location_names)]
     mx = np.amax(ids)
     intersection_mtx = np.zeros((mx + 1, mx + 1))
     for row in df:
-        intersection_mtx[int(row[0]), int(row[2])] = row[1]
-        intersection_mtx[int(row[2]), int(row[0])] = row[1]
+        fuzzy_mutual_position_matrix = row[8]
+        intersection_mtx[int(row[0]), int(row[2])] = fuzzy_mutual_position_matrix
     return intersection_mtx
 
 
-def grouping_ids(boxes, pred):
+def grouping_ids(boxes_with_order_numbers, pred):
     from YOLO.img_det import Box
     new_b_boxes = list()
 
-    list_of_b_boxes = functools.reduce(operator.iconcat, list(boxes.values()), [])
-    new_b_boxes.append(boxes['scene'])
-    for key, value in boxes.items():
+    list_of_b_boxes = functools.reduce(operator.iconcat, list(boxes_with_order_numbers.values()), [])
+    new_b_boxes.append(boxes_with_order_numbers['scene'])
+    for key, value in boxes_with_order_numbers.items():
         if key is not 'scene':
             if len(value) > 1:
                 key_id = attrgetter("id")
                 ids = [key_id(box) for box in value]
                 inter_mtx = generate_inter_matrix(ids, pred)
                 separated_groups_of_b_boxes = generate_groups(inter_mtx)
-                diff = list(set(ids) - set(flatten(separated_groups_of_b_boxes)))
-                separated_groups_of_b_boxes.append(diff)
                 if separated_groups_of_b_boxes:
                     for group in separated_groups_of_b_boxes:
                         if len(group) >= 2:
@@ -93,8 +95,8 @@ def grouping_coordinates(b_boxes_to_merge):
            max(XbottomRightList), max(YbottomRightList)
 
 
-def grouping(boxes_counted, pred, scene):
-    new_b_boxes, new_b_labels = grouping_ids(boxes_counted, pred)
+def grouping(boxes_with_order_numbers, pred, scene):
+    new_b_boxes, new_b_labels = grouping_ids(boxes_with_order_numbers, pred)
     new_scene, v_labels_matlab, v_boxes_matlab, v_labels_matlab_sequential \
         = new_gtruth(new_b_boxes, scene)
     return new_scene, v_labels_matlab, v_boxes_matlab, v_labels_matlab_sequential, new_b_boxes

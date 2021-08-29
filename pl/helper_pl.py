@@ -108,10 +108,10 @@ def verbalize_pred_pl(pred, scene, fuzzy, boxes):
     for i in range(len(pred)):
         curr_pred = pred[i, :]
         l = int(curr_pred[4])
-        location_name_curr = fuzzy.lev3.tname[l]
+        location_name_curr = fuzzy.lev3.location_names[l]
 
         o = int(curr_pred[6])
-        orientation_name_curr = fuzzy.lev3.oname[o]
+        orientation_name_curr = fuzzy.lev3.orientation_name[o]
         first_obj_name = scene.onames[scene.obj[int(curr_pred[0]), 1]]
         second_obj_name = scene.onames[scene.obj[int(curr_pred[2]), 1]]
 
