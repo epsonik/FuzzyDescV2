@@ -187,7 +187,7 @@ def create_replacement_g(framework_location, framework_orientation, resolved_obj
         result = a_string.split(":")
         object_place = int(result[0])
         box = get_box(resolved_obj_names_array[object_place], resolved_obj_places_array[object_place], boxes)
-        sequence_id = box.seq_id
+        sequence_id = get_seq_id(resolved_obj_names_array[object_place], resolved_obj_places_array[object_place], boxes)
         numerical = load_numerical_data()
         sequence_id_verb_name = get_verb_numerical(sequence_id, numerical)
 
