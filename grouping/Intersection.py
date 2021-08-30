@@ -24,7 +24,8 @@ def generate_groups(intersection_mtx):
     k = set()
     for idx, _ in enumerate(intersection_mtx):
         k.add(g.DFS(idx))
-    f = [list(x) for x in k if len(list(x)) > 1]
+    # f = [list(x) for x in k if len(list(x)) > 1]
+    f = [list(x) for x in k]
     return f
 
 
@@ -60,18 +61,16 @@ def grouping_ids(boxes_with_order_numbers, pred):
                 ids = [key_id(box) for box in value]
                 inter_mtx = generate_inter_matrix(ids, pred)
                 b_boxes_groups_separated = generate_groups(inter_mtx)
-                if b_boxes_groups_separated:
-                    for group in b_boxes_groups_separated:
-                        if len(group) >= 2:
-                            XtopLeft, YtopLeft, XbottomRight, YbottomRight = grouping_coordinates(
-                                filtr(group, list_of_b_boxes))
-                            box = Box(BoundBox(XtopLeft, YtopLeft, XbottomRight, YbottomRight), key, None, None,
-                                      is_group=True)
-                            new_b_boxes.append(box)
-                        else:
+                for group in b_boxes_groups_separated:
+                    if len(group) >= 2:
+                        XtopLeft, YtopLeft, XbottomRight, YbottomRight = grouping_coordinates(
+                            filtr(group, list_of_b_boxes))
+                        box = Box(BoundBox(XtopLeft, YtopLeft, XbottomRight, YbottomRight), key, None, None,
+                                  is_group=True)
+                        new_b_boxes.append(box)
+                    else:
+                        if group[0] in ids:
                             new_b_boxes.append(filtr(group, list_of_b_boxes))
-                else:
-                    new_b_boxes.append(value)
             else:
                 new_b_boxes.append(value)
     new_b_labels = [box.label for box in flatten(new_b_boxes)]

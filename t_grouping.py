@@ -37,7 +37,7 @@ def test_data():
          [10, 4, 486, 154, 30, 99],
          [11, 2, 424, 175, 30, 98]])
 
-    fname = '6813627120_a222bcba0d_z.jpg'
+    fname = '10.jpg'
     background2 = []
     background = []
     ocolors = []
