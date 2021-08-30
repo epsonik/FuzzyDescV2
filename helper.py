@@ -291,6 +291,14 @@ def get_seq_id(obj_name, id_from_predicate, boxes):
     return None
 
 
+def get_box(obj_name, id_from_predicate, boxes):
+    key_id = attrgetter("id")
+    boxes_for_label = boxes[obj_name]
+    for box in boxes_for_label:
+        if key_id(box) == int(id_from_predicate):
+            return box
+
+
 def generate_description(gtruth):
     fmpm_mat = create_fuzzy_mutual_posions_matrix(gtruth)
 

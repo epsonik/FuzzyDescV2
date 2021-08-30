@@ -2,7 +2,7 @@ import os
 
 import pandas as pd
 import re
-from helper import random_framework, get_row, get_seq_id
+from helper import random_framework, get_row, get_seq_id, get_box
 import copy
 
 
@@ -44,14 +44,14 @@ def verbalize_pred_eng(pred, scene, fuzzy, boxes, boxes_counted):
 
         framework_location = random_framework(frameworks_location[location_name_curr][0])
         framework_orientation = random_framework(frameworks_orientation[orientation_name_curr][0])
-        sentence = create_replacement(framework_location, framework_orientation,
-                                      [first_obj_name, second_obj_name], boxes,
-                                      [int(curr_pred[0]), int(curr_pred[2])])
+        sentence = create_replacement_g(framework_location, framework_orientation,
+                                        [first_obj_name, second_obj_name], boxes,
+                                        [int(curr_pred[0]), int(curr_pred[2])], data_multilingual_obj_names_lm)
         sentence = sentence.capitalize()
         txt = txt.__add__(sentence)
         txt = txt.__add__("\n")
         txt = txt.__add__("{} {} {} {}".format(int(curr_pred[0]), scene.onames[scene.obj[int(curr_pred[0]), 1]],
-                          int(curr_pred[2]), scene.onames[scene.obj[int(curr_pred[2]), 1]]))
+                                               int(curr_pred[2]), scene.onames[scene.obj[int(curr_pred[2]), 1]]))
         txt = txt.__add__("\n")
     return txt
 
@@ -84,7 +84,7 @@ def verbalize_pred_eng_s(pred, scene, fuzzy, boxes):
         txt = txt.__add__(sentence)
         txt = txt.__add__("\n")
         txt = txt.__add__("{} {} {} {}".format(int(curr_pred[0]), scene.onames[scene.obj[int(curr_pred[0]), 1]],
-                          int(curr_pred[2]), scene.onames[scene.obj[int(curr_pred[2]), 1]]))
+                                               int(curr_pred[2]), scene.onames[scene.obj[int(curr_pred[2]), 1]]))
 
         txt = txt.__add__("\n")
     return txt
@@ -169,6 +169,37 @@ def create_replacement(framework_location, framework_orientation, resolved_obj_n
             sentence = sentence.replace(s,
                                         "{} {}".format(sequence_id_verb_name, resolved_obj_names_array[object_place]))
         sentence = sentence.replace(s, resolved_obj_names_array[object_place])
+
+    regex_orientation = r'\[(.*?)\]'
+    obj_places_orientation = re.findall(regex_orientation, framework_location)
+    s = "[" + obj_places_orientation[0] + "]"
+    sentence = sentence.replace(s, framework_orientation)
+    return sentence
+
+
+def create_replacement_g(framework_location, framework_orientation, resolved_obj_names_array, boxes,
+                         resolved_obj_places_array, data_multilingual_obj_names_lm):
+    regex_location = r'\{(.*?)\}'
+
+    obj_places_location = re.findall(regex_location, framework_location)
+    sentence = copy.copy(framework_location)
+    for a_string in obj_places_location:
+        result = a_string.split(":")
+        object_place = int(result[0])
+        box = get_box(resolved_obj_names_array[object_place], resolved_obj_places_array[object_place], boxes)
+        sequence_id = box.seq_id
+        numerical = load_numerical_data()
+        sequence_id_verb_name = get_verb_numerical(sequence_id, numerical)
+
+        s = "{" + a_string + "}"
+        obj_name = resolved_obj_names_array[object_place]
+        if box.is_group:
+            lm = get_row(data_multilingual_obj_names_lm, obj_name)
+            obj_name = "group of {}".format(lm["LM"])
+        if sequence_id_verb_name is not '':
+            sentence = sentence.replace(s,
+                                        "{} {}".format(sequence_id_verb_name, obj_name))
+        sentence = sentence.replace(s, obj_name)
 
     regex_orientation = r'\[(.*?)\]'
     obj_places_orientation = re.findall(regex_orientation, framework_location)
