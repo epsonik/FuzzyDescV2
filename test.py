@@ -12,7 +12,7 @@ import numpy as np
 from eng.helper_eng import verbalize_pred_eng, verbalize_pred_eng_s
 from grouping.Intersection import grouping
 from helper import generate_description, count_ids, verbalize_pred, count_ids_g
-from t_grouping_9 import test_data
+from t_grouping import test_data
 from helper import fuzzy
 
 
@@ -47,8 +47,8 @@ def from_pic(input_filename):
 
 
 def for_img(input_filename):
-    gtruth, v_labels_matlab, v_labels_matlab_sequential, v_boxes, image_w, image_h = from_pic(input_filename)
-    # gtruth, v_labels_matlab_sequential, v_boxes, image_w, image_h = test_data()
+    # gtruth, v_labels_matlab, v_labels_matlab_sequential, v_boxes, image_w, image_h = from_pic(input_filename)
+    gtruth, v_labels_matlab_sequential, v_boxes, image_w, image_h = test_data()
     print(gtruth.fname)
     pred_sort, pred = generate_description(gtruth)
     boxes_with_order_numbers = count_ids(pred_sort, gtruth, v_boxes)

@@ -40,7 +40,6 @@ class Graph:
 
         # Create a set to store visited vertices
         visited = set()
-
         # Call the recursive helper function
         # to print DFS traversal
         self.DFSUtil(v, visited)

@@ -108,7 +108,12 @@ def generate_preambule(data_multilingual_obj_names_lm, boxes, boxes_counted_sep)
 
     groups, single = filtr()
     for object_name in single.keys():
-        preambule_single = preambule_single.__add__(framework.format(object_name))
+        number_of_obj_for_label = len(single[object_name])
+        sentence = object_name
+        if number_of_obj_for_label > 1:
+            sentence = create_replacement_lm_s(data_multilingual_obj_names_lm, object_name, framework,
+                                               number_of_obj_for_label)
+        preambule_single = preambule_single.__add__(framework.format(sentence))
         preambule_single = preambule_single.__add__(dot_or_comma(object_name, single))
     preambule_single = preambule_single.capitalize()
     preambule = preambule.__add__(preambule_single)

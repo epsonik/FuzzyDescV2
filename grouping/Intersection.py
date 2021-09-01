@@ -24,7 +24,6 @@ def generate_groups(intersection_mtx):
     k = set()
     for idx, _ in enumerate(intersection_mtx):
         k.add(g.DFS(idx))
-    # f = [list(x) for x in k if len(list(x)) > 1]
     f = [list(x) for x in k]
     return f
 
@@ -62,11 +61,13 @@ def grouping_ids(boxes_with_order_numbers, pred):
                 inter_mtx = generate_inter_matrix(ids, pred)
                 b_boxes_groups_separated = generate_groups(inter_mtx)
                 for group in b_boxes_groups_separated:
+                    obj_quantity_in_group = len(group)
                     if len(group) >= 2:
                         XtopLeft, YtopLeft, XbottomRight, YbottomRight = grouping_coordinates(
                             filtr(group, list_of_b_boxes))
                         box = Box(BoundBox(XtopLeft, YtopLeft, XbottomRight, YbottomRight), key, None, None,
                                   is_group=True)
+                        box.obj_quantity_in_group = obj_quantity_in_group
                         new_b_boxes.append(box)
                     else:
                         if group[0] in ids:
