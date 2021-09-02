@@ -74,8 +74,9 @@ def grouping_ids(boxes_with_order_numbers, pred):
                             new_b_boxes.append(filtr(group, list_of_b_boxes))
             else:
                 new_b_boxes.append(value)
-    new_b_labels = [box.label for box in flatten(new_b_boxes)]
-    return list(flatten(new_b_boxes)), new_b_labels
+    new_b_boxes_flatten = list(flatten(new_b_boxes))
+    new_b_labels = [box.label for box in new_b_boxes_flatten]
+    return new_b_boxes_flatten, new_b_labels
 
 
 def filtr(group, list_of_b_boxes):
