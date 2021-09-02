@@ -235,8 +235,8 @@ def count_ids(pred, scene, v_boxes):
 
 
 def count_ids_g(pred, scene, v_boxes):
-    boxes2 = dict()
-    boxes3 = {}
+    boxes_with_order_numbers_sep = dict()
+    boxes_with_order_numbers = {}
     for i in range(len(pred)):
         curr_pred = pred[i, :]
         first_obj_name = scene.onames[scene.obj[int(curr_pred[0]), 1]]
@@ -244,13 +244,13 @@ def count_ids_g(pred, scene, v_boxes):
 
         def check_labels(object_name, obj_number):
             b = v_boxes[obj_number]
-            if object_name not in boxes2:
+            if object_name not in boxes_with_order_numbers_sep:
                 b.seq_id = 1
-                boxes2[object_name] = {'group': [], 'single': []}
+                boxes_with_order_numbers_sep[object_name] = {'group': [], 'single': []}
                 if b.is_group:
-                    boxes2[object_name]['group'].append(b)
+                    boxes_with_order_numbers_sep[object_name]['group'].append(b)
                 else:
-                    boxes2[object_name]['single'].append(b)
+                    boxes_with_order_numbers_sep[object_name]['single'].append(b)
             else:
                 def p(a):
                     key_id = attrgetter("id")
@@ -258,15 +258,15 @@ def count_ids_g(pred, scene, v_boxes):
                         b.seq_id = len(a) + 1
                         a.append(b)
                 if b.is_group:
-                    p(boxes2[object_name]['group'])
+                    p(boxes_with_order_numbers_sep[object_name]['group'])
                 else:
-                    p(boxes2[object_name]['single'])
+                    p(boxes_with_order_numbers_sep[object_name]['single'])
 
         check_labels(first_obj_name, int(curr_pred[0]))
         check_labels(second_obj_name, int(curr_pred[2]))
-    for key in boxes2.keys():
-        boxes3[key] = list(boxes2[key]['single'] + boxes2[key]['group'])
-    return boxes3, boxes2
+    for key in boxes_with_order_numbers_sep.keys():
+        boxes_with_order_numbers[key] = list(boxes_with_order_numbers_sep[key]['single'] + boxes_with_order_numbers_sep[key]['group'])
+    return boxes_with_order_numbers, boxes_with_order_numbers_sep
 
 
 def find_name(data, name):

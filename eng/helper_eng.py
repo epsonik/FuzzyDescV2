@@ -111,15 +111,20 @@ def generate_preambule(data_multilingual_obj_names_lm, boxes, boxes_counted_sep)
                         groups[key] = boxes_counted_sep[key]["group"]
                 if boxes_counted_sep[key]["single"]:
                     single[key] = boxes_counted_sep[key]["single"]
+
         return groups, single, multiple_groups
 
     groups, single, multiple_groups = filtr()
+    have_group_and_singleton = False
     for object_name in single.keys():
         number_of_obj_for_label = len(single[object_name])
         sentence = object_name
+        if (boxes_counted_sep[object_name]["single"]) and (boxes_counted_sep[object_name]["group"]):
+            have_group_and_singleton = True
+            sentence = "single " + object_name
         if number_of_obj_for_label > 1:
             sentence = create_replacement_lm_s(data_multilingual_obj_names_lm, object_name, framework,
-                                               number_of_obj_for_label)
+                                               number_of_obj_for_label, have_group_and_singleton)
         preambule_single = preambule_single.__add__(framework.format(sentence))
         preambule_single = preambule_single.__add__(dot_or_comma(object_name, single.keys()))
     preambule_single = preambule_single.capitalize()
@@ -243,7 +248,6 @@ def create_replacement_multigroups(data_multilingual_obj_names_lm, object_name, 
     sentence = "{} groups of {}. ".format(get_verb_numerical(number_of_obj_for_label, main_numerals, col='VERB'),
                                           object_row[object_case_name])
 
-
     for group_box in groups_array[object_name]:
         framework_for_sentence_for_elements_in_group = random_framework(
             "{} group consists {} elements.*{} group have {} elements.")
@@ -256,21 +260,26 @@ def create_replacement_multigroups(data_multilingual_obj_names_lm, object_name, 
     return sentence
 
 
-def create_replacement_lm_s(data_multilingual_obj_names_lm, object_name, framework, number_of_obj_for_label):
+def create_replacement_lm_s(data_multilingual_obj_names_lm, object_name, framework, number_of_obj_for_label,
+                            have_group_and_singleton=False
+                            ):
     regex = r'\{(.*?)\}'
     obj_places = re.findall(regex, framework)
     sentence = copy.copy(framework)
     for a_string in obj_places:
         object_case_name = 'LM'
         object_row = get_row(data_multilingual_obj_names_lm, object_name)
-        numerical = load_numerical_data_main_numerals()
-        verbal_name = get_verb_numerical(number_of_obj_for_label, numerical, col='VERB')
+        main_numerals = load_numerical_data_main_numerals()
+        verbal_name = get_verb_numerical(number_of_obj_for_label, main_numerals, col='VERB')
         s = "{" + a_string + "}"
+        obj_name = object_row[object_case_name]
+        if have_group_and_singleton:
+            obj_name = " single " + obj_name
         if verbal_name is not '':
             sentence = sentence.replace(s,
                                         "{} {}".format(verbal_name,
-                                                       object_row[object_case_name]))
-        sentence = sentence.replace(s, object_row[object_case_name])
+                                                       obj_name))
+        sentence = sentence.replace(s, obj_name)
     return sentence
 
 
