@@ -242,10 +242,11 @@ def create_replacement_multigroups(data_multilingual_obj_names_lm, object_name, 
 
     sentence = "{} groups of {}. ".format(get_verb_numerical(number_of_obj_for_label, main_numerals, col='VERB'),
                                           object_row[object_case_name])
-    framework_for_sentence_for_elements_in_group = random_framework(
-        "{} group consists {} elements.*{} group have {} elements.")
+
 
     for group_box in groups_array[object_name]:
+        framework_for_sentence_for_elements_in_group = random_framework(
+            "{} group consists {} elements.*{} group have {} elements.")
         sequence_id_verb_name = get_verb_numerical(group_box.seq_id, order_numerals)
         sentence_for_elements_in_group = framework_for_sentence_for_elements_in_group.format(sequence_id_verb_name,
                                                                                              group_box.obj_quantity_in_group)
