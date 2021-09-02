@@ -204,7 +204,7 @@ def create_replacement(framework_location, framework_orientation, resolved_obj_n
     sentence = sentence.replace(s, framework_orientation)
     return sentence
 
-
+# construct sentence
 def create_replacement_g(framework_location, framework_orientation, resolved_obj_names_array, boxes,
                          resolved_obj_places_array, data_multilingual_obj_names_lm):
     regex_location = r'\{(.*?)\}'
