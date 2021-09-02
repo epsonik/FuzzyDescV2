@@ -257,7 +257,6 @@ def count_ids_g(pred, scene, v_boxes):
                     if not any(key_id(i) == obj_number for i in a):
                         b.seq_id = len(a) + 1
                         a.append(b)
-
                 if b.is_group:
                     p(boxes2[object_name]['group'])
                 else:

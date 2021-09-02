@@ -47,8 +47,8 @@ def from_pic(input_filename):
 
 
 def for_img(input_filename):
-    # gtruth, v_labels_matlab, v_labels_matlab_sequential, v_boxes, image_w, image_h = from_pic(input_filename)
-    gtruth, v_labels_matlab_sequential, v_boxes, image_w, image_h = test_data()
+    gtruth, v_labels_matlab, v_labels_matlab_sequential, v_boxes, image_w, image_h = from_pic(input_filename)
+    # gtruth, v_labels_matlab_sequential, v_boxes, image_w, image_h = test_data()
     print(gtruth.fname)
     pred_sort, pred = generate_description(gtruth)
     boxes_with_order_numbers = count_ids(pred_sort, gtruth, v_boxes)

@@ -2,6 +2,9 @@ import os
 
 import pandas as pd
 import re
+
+from setuptools.namespaces import flatten
+
 from helper import random_framework, get_row, get_seq_id, get_box
 import copy
 
@@ -97,16 +100,20 @@ def generate_preambule(data_multilingual_obj_names_lm, boxes, boxes_counted_sep)
 
     def filtr():
         groups = dict()
+        multiple_groups = dict()
         single = dict()
         for key in boxes_counted_sep.keys():
             if key is not "scene":
                 if boxes_counted_sep[key]["group"]:
-                    groups[key] = boxes_counted_sep[key]["group"]
+                    if len(boxes_counted_sep[key]["group"]) > 1:
+                        multiple_groups[key] = boxes_counted_sep[key]["group"]
+                    elif len(boxes_counted_sep[key]["group"]) == 1:
+                        groups[key] = boxes_counted_sep[key]["group"]
                 if boxes_counted_sep[key]["single"]:
                     single[key] = boxes_counted_sep[key]["single"]
-        return groups, single
+        return groups, single, multiple_groups
 
-    groups, single = filtr()
+    groups, single, multiple_groups = filtr()
     for object_name in single.keys():
         number_of_obj_for_label = len(single[object_name])
         sentence = object_name
@@ -114,33 +121,38 @@ def generate_preambule(data_multilingual_obj_names_lm, boxes, boxes_counted_sep)
             sentence = create_replacement_lm_s(data_multilingual_obj_names_lm, object_name, framework,
                                                number_of_obj_for_label)
         preambule_single = preambule_single.__add__(framework.format(sentence))
-        preambule_single = preambule_single.__add__(dot_or_comma(object_name, single))
+        preambule_single = preambule_single.__add__(dot_or_comma(object_name, single.keys()))
     preambule_single = preambule_single.capitalize()
     preambule = preambule.__add__(preambule_single)
 
     if len(groups.keys()) >= 1:
         preambule_many = ' We see also '
-        for object_name in groups.keys():
-            number_of_obj_for_label = len(groups[object_name])
-            sentence = create_replacement_lm(data_multilingual_obj_names_lm, object_name,
-                                             number_of_obj_for_label)
-            preambule_many = preambule_many.__add__(sentence)
-            preambule_many = preambule_many.__add__(dot_or_comma(object_name, groups))
-        preambule = preambule.__add__(preambule_many)
 
+        for object_name in groups.keys():
+            sentence = create_replacement_lm(data_multilingual_obj_names_lm, object_name,
+                                             groups[object_name])
+            preambule_many = preambule_many.__add__(sentence)
+            preambule_many = preambule_many.__add__(dot_or_comma(object_name, groups.keys()))
+        preambule = preambule.__add__(preambule_many)
+    if multiple_groups.keys():
+        preambule_many = ' What is more, there are '
+        for object_name in multiple_groups.keys():
+            sentence = create_replacement_multigroups(data_multilingual_obj_names_lm, object_name,
+                                                      multiple_groups)
+            preambule_many = preambule_many.__add__(sentence)
+        preambule = preambule.__add__(preambule_many)
     return preambule
 
 
 def generate_preambule_s(data_multilingual_obj_names_lm, boxes):
     preambule = ""
     preambule_single = 'On the picture we see '
-
     framework = "{}"
     many = dict(filter(lambda elem: len(elem[1]) > 1 and elem[0] is not "scene", boxes.items()))
     single = dict(filter(lambda elem: len(elem[1]) <= 1 and elem[0] is not "scene", boxes.items()))
     for object_name in single.keys():
         preambule_single = preambule_single.__add__(framework.format(object_name))
-        preambule_single = preambule_single.__add__(dot_or_comma(object_name, single))
+        preambule_single = preambule_single.__add__(dot_or_comma(object_name, single.keys()))
     preambule_single = preambule_single.capitalize()
     preambule = preambule.__add__(preambule_single)
     if len(many.keys()) >= 1:
@@ -150,7 +162,7 @@ def generate_preambule_s(data_multilingual_obj_names_lm, boxes):
             sentence = create_replacement_lm_s(data_multilingual_obj_names_lm, object_name, framework,
                                                number_of_obj_for_label)
             preambule_many = preambule_many.__add__(sentence)
-            preambule_many = preambule_many.__add__(dot_or_comma(object_name, many))
+            preambule_many = preambule_many.__add__(dot_or_comma(object_name, many.keys()))
         preambule = preambule.__add__(preambule_many)
 
     return preambule
@@ -159,14 +171,13 @@ def generate_preambule_s(data_multilingual_obj_names_lm, boxes):
 def create_replacement(framework_location, framework_orientation, resolved_obj_names_array, boxes,
                        resolved_obj_places_array):
     regex_location = r'\{(.*?)\}'
-
     obj_places_location = re.findall(regex_location, framework_location)
     sentence = copy.copy(framework_location)
     for a_string in obj_places_location:
         result = a_string.split(":")
         object_place = int(result[0])
         sequence_id = get_seq_id(resolved_obj_names_array[object_place], resolved_obj_places_array[object_place], boxes)
-        numerical = load_numerical_data()
+        numerical = load_numerical_data_order_numerals()
         sequence_id_verb_name = get_verb_numerical(sequence_id, numerical)
         s = "{" + a_string + "}"
 
@@ -193,7 +204,7 @@ def create_replacement_g(framework_location, framework_orientation, resolved_obj
         object_place = int(result[0])
         box = get_box(resolved_obj_names_array[object_place], resolved_obj_places_array[object_place], boxes)
         sequence_id = get_seq_id(resolved_obj_names_array[object_place], resolved_obj_places_array[object_place], boxes)
-        numerical = load_numerical_data()
+        numerical = load_numerical_data_order_numerals()
         sequence_id_verb_name = get_verb_numerical(sequence_id, numerical)
 
         s = "{" + a_string + "}"
@@ -213,21 +224,35 @@ def create_replacement_g(framework_location, framework_orientation, resolved_obj
     return sentence
 
 
-def create_replacement_lm(data_multilingual_obj_names_lm, object_name, number_of_obj_for_label):
-    framework_s = "{} group of {}"
-    framework_lm = "{} groups of {}"
+def create_replacement_lm(data_multilingual_obj_names_lm, object_name, groups_array):
     object_case_name = 'LM'
     object_row = get_row(data_multilingual_obj_names_lm, object_name)
+    numerical = load_numerical_data_main_numerals()
+    verbal_name = get_verb_numerical(groups_array[0].obj_quantity_in_group, numerical, col='VERB')
+    framework_s = "group of {}, " + random_framework("that consists {} elements*with {} elements")
+    return framework_s.format(object_row[object_case_name], verbal_name)
 
-    numerical = load_numerical_data_lm()
-    verbal_name = get_verb_numerical(number_of_obj_for_label, numerical, col='VERB')
 
-    if verbal_name is not '':
-        if number_of_obj_for_label != 1:
-            return framework_lm.format(verbal_name, object_row[object_case_name])
-        else:
-            return framework_s.format(verbal_name, object_row[object_case_name])
-    return {}
+def create_replacement_multigroups(data_multilingual_obj_names_lm, object_name, groups_array):
+    number_of_obj_for_label = len(groups_array[object_name])
+    object_case_name = 'LM'
+    object_row = get_row(data_multilingual_obj_names_lm, object_name)
+    main_numerals = load_numerical_data_main_numerals()
+    order_numerals = load_numerical_data_order_numerals()
+
+    sentence = "{} groups of {}. ".format(get_verb_numerical(number_of_obj_for_label, main_numerals, col='VERB'),
+                                          object_row[object_case_name])
+    framework_for_sentence_for_elements_in_group = random_framework(
+        "{} group consists {} elements.*{} group have {} elements.")
+
+    for group_box in groups_array[object_name]:
+        sequence_id_verb_name = get_verb_numerical(group_box.seq_id, order_numerals)
+        sentence_for_elements_in_group = framework_for_sentence_for_elements_in_group.format(sequence_id_verb_name,
+                                                                                             group_box.obj_quantity_in_group)
+
+        sentence = sentence.__add__(sentence_for_elements_in_group.capitalize())
+        sentence = sentence.__add__(" ")
+    return sentence
 
 
 def create_replacement_lm_s(data_multilingual_obj_names_lm, object_name, framework, number_of_obj_for_label):
@@ -237,7 +262,7 @@ def create_replacement_lm_s(data_multilingual_obj_names_lm, object_name, framewo
     for a_string in obj_places:
         object_case_name = 'LM'
         object_row = get_row(data_multilingual_obj_names_lm, object_name)
-        numerical = load_numerical_data_lm()
+        numerical = load_numerical_data_main_numerals()
         verbal_name = get_verb_numerical(number_of_obj_for_label, numerical, col='VERB')
         s = "{" + a_string + "}"
         if verbal_name is not '':
@@ -248,13 +273,13 @@ def create_replacement_lm_s(data_multilingual_obj_names_lm, object_name, framewo
     return sentence
 
 
-def load_numerical_data():
+def load_numerical_data_order_numerals():
     data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "./order_numerals/numerals.csv")
     numerical = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
     return numerical
 
 
-def load_numerical_data_lm():
+def load_numerical_data_main_numerals():
     data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "./main_numerals/numerals.csv")
     numerical = pd.read_csv(data_path, delimiter=', ', engine='python', index_col=None)
     return numerical
@@ -274,9 +299,9 @@ def get_verb_numerical(sequence_id, numerical, col='VERB_SEQ'):
 
 
 def dot_or_comma(object_name, obj_list):
-    if object_name == list(obj_list.keys())[-1]:
+    if object_name == list(obj_list)[-1]:
         return "."
     else:
-        if object_name == list(obj_list.keys())[-2]:
+        if (object_name == list(obj_list)[-2]):
             return " and "
         return ", "
