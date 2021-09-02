@@ -207,10 +207,13 @@ def dot_or_comma(object_name, obj_list):
         return ", "
 
 
+# get random framework for sentence
 def random_framework(framework):
     return random.choice(framework.split("*"))
 
 
+# create dictionary
+# label_A:{bounding_box_1_with_label_A, bounding_box_2_with_label_A....}
 def count_ids(pred, scene, v_boxes):
     from YOLO.img_det import Box
     boxes2 = dict()
@@ -226,6 +229,14 @@ def count_ids(pred, scene, v_boxes):
             else:
                 key_id = attrgetter("id")
                 if not any(key_id(i) == obj_number for i in boxes2[object_name]):
+                    # Box(
+                    # self.box = box
+                    # self.label = label -label of bounding box
+                    # self.seq_id = seq_id - id of bounding box in sequnece of other bounding boxes with the same label
+                    # self.id = id - set id of bounding box from predicates table
+                    # self.is_group = is_group - check if bounding box is group (grouping mechanism).
+                    # We store info if bounding box is a product of grouping other bounding boxes
+                    # )
                     boxes2[object_name].append(
                         Box(v_boxes[obj_number], object_name, len(boxes2[object_name]) + 1, obj_number))
 
@@ -234,6 +245,8 @@ def count_ids(pred, scene, v_boxes):
     return boxes2
 
 
+# group boxes but for grouping task
+# pred - newly generated predicates for groups
 def count_ids_g(pred, scene, v_boxes):
     boxes_with_order_numbers_sep = dict()
     boxes_with_order_numbers = {}
@@ -242,6 +255,7 @@ def count_ids_g(pred, scene, v_boxes):
         first_obj_name = scene.onames[scene.obj[int(curr_pred[0]), 1]]
         second_obj_name = scene.onames[scene.obj[int(curr_pred[2]), 1]]
 
+        # for each label we check if bounding box is single or is group
         def check_labels(object_name, obj_number):
             b = v_boxes[obj_number]
             if object_name not in boxes_with_order_numbers_sep:
@@ -257,6 +271,7 @@ def count_ids_g(pred, scene, v_boxes):
                     if not any(key_id(i) == obj_number for i in a):
                         b.seq_id = len(a) + 1
                         a.append(b)
+
                 if b.is_group:
                     p(boxes_with_order_numbers_sep[object_name]['group'])
                 else:
@@ -265,7 +280,8 @@ def count_ids_g(pred, scene, v_boxes):
         check_labels(first_obj_name, int(curr_pred[0]))
         check_labels(second_obj_name, int(curr_pred[2]))
     for key in boxes_with_order_numbers_sep.keys():
-        boxes_with_order_numbers[key] = list(boxes_with_order_numbers_sep[key]['single'] + boxes_with_order_numbers_sep[key]['group'])
+        boxes_with_order_numbers[key] = list(
+            boxes_with_order_numbers_sep[key]['single'] + boxes_with_order_numbers_sep[key]['group'])
     return boxes_with_order_numbers, boxes_with_order_numbers_sep
 
 
@@ -273,6 +289,7 @@ def find_name(data, name):
     return data[data[:, 0] == name, :][0]
 
 
+# get row from file with language data for specific word
 def get_row(data, name, key='ENG'):
     return data.iloc[
         data.index[data[key] == name]].to_dict('records')[0]

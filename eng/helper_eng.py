@@ -3,12 +3,11 @@ import os
 import pandas as pd
 import re
 
-from setuptools.namespaces import flatten
-
 from helper import random_framework, get_row, get_seq_id, get_box
 import copy
 
 
+# texts for english descriptions
 def load_lang_data_eng():
     data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "./location.csv")
     frameworks_location = pd.read_csv(data_path, delimiter='; ', engine='python', header=None).values
@@ -59,6 +58,7 @@ def verbalize_pred_eng(pred, scene, fuzzy, boxes, boxes_counted):
     return txt
 
 
+# generate description for predicates that were not grouped
 def verbalize_pred_eng_s(pred, scene, fuzzy, boxes):
     txt = ""
     frameworks_location, \
@@ -93,11 +93,14 @@ def verbalize_pred_eng_s(pred, scene, fuzzy, boxes):
     return txt
 
 
+# generating preambule(text at the beginning that briefly describes image) - grouped predicates
 def generate_preambule(data_multilingual_obj_names_lm, boxes, boxes_counted_sep):
     preambule = ""
     preambule_single = 'On the picture we see '
     framework = "{}"
 
+    # create descriptions for all obj types
+    # multigroup - one label but many groups for that label
     def filtr():
         groups = dict()
         multiple_groups = dict()
@@ -116,9 +119,11 @@ def generate_preambule(data_multilingual_obj_names_lm, boxes, boxes_counted_sep)
 
     groups, single, multiple_groups = filtr()
     have_group_and_singleton = False
+    # part of sentence with single bounding boxes
     for object_name in single.keys():
         number_of_obj_for_label = len(single[object_name])
         sentence = object_name
+        # add word 'single' when we have single object for label that have groups
         if (boxes_counted_sep[object_name]["single"]) and (boxes_counted_sep[object_name]["group"]):
             have_group_and_singleton = True
             sentence = "single " + object_name
@@ -129,7 +134,7 @@ def generate_preambule(data_multilingual_obj_names_lm, boxes, boxes_counted_sep)
         preambule_single = preambule_single.__add__(dot_or_comma(object_name, single.keys()))
     preambule_single = preambule_single.capitalize()
     preambule = preambule.__add__(preambule_single)
-
+    # part of sentence with grouped bounding boxes
     if len(groups.keys()) >= 1:
         preambule_many = ' We see also '
 
@@ -139,6 +144,7 @@ def generate_preambule(data_multilingual_obj_names_lm, boxes, boxes_counted_sep)
             preambule_many = preambule_many.__add__(sentence)
             preambule_many = preambule_many.__add__(dot_or_comma(object_name, groups.keys()))
         preambule = preambule.__add__(preambule_many)
+    # part of sentence with multigroup bounding boxes
     if multiple_groups.keys():
         preambule_many = ' What is more, there are '
         for object_name in multiple_groups.keys():
@@ -149,6 +155,7 @@ def generate_preambule(data_multilingual_obj_names_lm, boxes, boxes_counted_sep)
     return preambule
 
 
+# generating preambule(text at the beginning that briefly describes image) - not grouped predicates
 def generate_preambule_s(data_multilingual_obj_names_lm, boxes):
     preambule = ""
     preambule_single = 'On the picture we see '
@@ -260,6 +267,7 @@ def create_replacement_multigroups(data_multilingual_obj_names_lm, object_name, 
     return sentence
 
 
+# replace object name with word variant, order and main number
 def create_replacement_lm_s(data_multilingual_obj_names_lm, object_name, framework, number_of_obj_for_label,
                             have_group_and_singleton=False
                             ):

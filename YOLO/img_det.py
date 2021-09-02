@@ -158,6 +158,8 @@ class Box:
         self.is_group = is_group
 
 
+# change format of bounding box from top left and bottom right points  to the matlab format
+# top left point and bounding box width and height
 def return_coordinates(v_boxes, v_labels):
     v_boxes_matlab = []
     v_labels_matlab = []
@@ -166,6 +168,7 @@ def return_coordinates(v_boxes, v_labels):
         y1, x1, y2, x2 = box.YtopLeft, box.XtopLeft, box.YbottomRight, box.XbottomRight
         width, height = box.calculate_width(), box.calculate_height()
 
+        # extract labels that do not repeat
         def check_labels(lab):
             if lab not in v_labels_matlab:
                 v_labels_matlab.append(lab)

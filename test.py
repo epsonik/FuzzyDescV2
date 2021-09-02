@@ -20,15 +20,15 @@ def from_pic(input_filename):
     input_filename = str(input_filename)
     print("The file name you entered is: ", input_filename)
     photo_boxed_filename = input_filename.replace('.jpg', '_boxed.jpg')
+    # load image data from image recognition engine
     v_boxes, v_labels, v_scores, image_w, image_h = vbox_engine(input_filename,
                                                                 photo_boxed_filename)
     v_boxes.insert(0, BoundBox(XtopLeft=10, YtopLeft=10, XbottomRight=image_w + 10, YbottomRight=image_h + 10,
                                label='scene', label_id=0))
     v_labels.insert(0, 'scene')
     v_boxes_matlab, v_labels_matlab, v_labels_matlab_sequential = return_coordinates(v_boxes, v_labels)
-
+    # create scene object
     image = Image.open(input_filename)
-
     size = image.size
     onames = v_labels_matlab
     obj_num = len(v_boxes_matlab)

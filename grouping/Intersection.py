@@ -34,8 +34,11 @@ def _adj_width_height(box, n):
     return box[0], XtopLeft - n, YtopLeft - n, XbottomRight + n, YbottomRight + n
 
 
+# ids - list of bounding boxes ids with same label that are analyzed for being in one group
 def generate_inter_matrix(ids, pred):
+    # get accpeted location names
     allowed_location_names = get_location_names_indexes([CLOSE, TOUCHING, CROSSING, INSIDE, LARGER, SPLIT, SAME])
+    # from matrix with all predicates filter rows with relations between bounding boxes with specific ids
     df = pred[np.in1d(pred[:, 0], ids) & np.in1d(pred[:, 2], ids) & np.in1d(pred[:, 4], allowed_location_names)]
     mx = np.amax(ids)
     intersection_mtx = np.zeros((mx + 1, mx + 1))
@@ -49,7 +52,7 @@ def generate_inter_matrix(ids, pred):
 def grouping_ids(boxes_with_order_numbers, pred):
     from YOLO.img_det import Box
     new_b_boxes = list()
-
+    # get all bounding boes from dictionary
     list_of_b_boxes = functools.reduce(operator.iconcat, list(boxes_with_order_numbers.values()), [])
     new_b_boxes.append(boxes_with_order_numbers['scene'])
     for key, value in boxes_with_order_numbers.items():
@@ -65,12 +68,15 @@ def grouping_ids(boxes_with_order_numbers, pred):
                     if len(group) >= 2:
                         XtopLeft, YtopLeft, XbottomRight, YbottomRight = grouping_coordinates(
                             filtr(group, list_of_b_boxes))
+                        # create list with new bounding boxes generated from grouped bounding boxes
                         box = Box(BoundBox(XtopLeft, YtopLeft, XbottomRight, YbottomRight), key, None, None,
                                   is_group=True)
+                        # number of bounding boxes in newly generated group
                         box.obj_quantity_in_group = obj_quantity_in_group
                         new_b_boxes.append(box)
                     else:
                         if group[0] in ids:
+                            # add bounding boxes that have label from newly generated group, but do not belong to group
                             new_b_boxes.append(filtr(group, list_of_b_boxes))
             else:
                 new_b_boxes.append(value)
@@ -79,6 +85,7 @@ def grouping_ids(boxes_with_order_numbers, pred):
     return new_b_boxes_flatten, new_b_labels
 
 
+# get bounding box by id from predicates matrix
 def filtr(group, list_of_b_boxes):
     key_id = attrgetter("id")
     objects = list()
@@ -88,9 +95,11 @@ def filtr(group, list_of_b_boxes):
     return objects
 
 
+# merge boundng boxes
 def grouping_coordinates(b_boxes_to_merge):
     XtopLeftList, YtopLeftList = list(), list()
     XbottomRightList, YbottomRightList = list(), list()
+    # gwet fares coordinates
     for box in b_boxes_to_merge:
         XtopLeftList.append(int(box.box.XtopLeft))
         YtopLeftList.append(int(box.box.YtopLeft))
