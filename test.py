@@ -12,7 +12,7 @@ import numpy as np
 from eng.helper_eng import verbalize_pred_eng, verbalize_pred_eng_s
 from grouping.Intersection import grouping
 from helper import generate_description, count_ids, verbalize_pred, count_ids_g
-from t_grouping import test_data
+from t_grouping_9 import test_data
 from helper import fuzzy
 
 
